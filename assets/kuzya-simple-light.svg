@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><title>Kuzya</title>
 <rect width="512" height="512" rx="112" fill="#E9EBEF"/>
-<path fill="#14968F" d="M146,236 H366 V330 A110,110 0 0 1 146,330 Z"/>
+<path fill="#14968F" d="M146,236 H366 V330 A110,82 0 0 1 146,330 Z"/>
 <polygon fill="#F2552C" points="96,236 416,236 256,58"/>
 <g fill="#14151C">
 <circle cx="208" cy="290" r="20"/>

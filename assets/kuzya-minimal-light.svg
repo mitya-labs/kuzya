@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><title>Kuzya</title>
 <rect width="512" height="512" rx="112" fill="#E9EBEF"/>
 <polygon fill="#F2552C" points="96,244 416,244 256,64"/>
-<path fill="#14968F" d="M126,276 H386 A130,130 0 0 1 126,276 Z"/>
+<path fill="#14968F" d="M126,276 H386 A130,98 0 0 1 126,276 Z"/>
 <g fill="#14151C">
 <circle cx="208" cy="322" r="18"/>
 <circle cx="304" cy="322" r="18"/>

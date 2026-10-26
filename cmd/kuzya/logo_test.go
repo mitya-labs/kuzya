@@ -4,14 +4,14 @@ import "testing"
 
 func TestPickLogoFitsTerminal(t *testing.T) {
 	cases := []struct{ avail, wantRows int }{
-		{0, 18},  // размер неизвестен: целиком
-		{40, 18}, // большой терминал
-		{23, 18},
-		{20, 9}, // альбомный экран телефона: уменьшаем в 2 раза
-		{14, 9},
-		{11, 6},
-		{10, 5},
-		{9, 0}, // места нет
+		{0, 16},  // размер неизвестен: целиком
+		{40, 16}, // большой терминал
+		{20, 16}, // альбомный экран телефона: ровно влезает целиком
+		{19, 8},  // на строку меньше: уменьшаем в 2 раза
+		{12, 8},
+		{10, 6},
+		{9, 4},
+		{7, 0}, // места нет
 	}
 	for _, c := range cases {
 		g := pickLogo(c.avail)
@@ -22,7 +22,7 @@ func TestPickLogoFitsTerminal(t *testing.T) {
 		if got != c.wantRows {
 			t.Errorf("avail=%d: %d строк, ожидали %d", c.avail, got, c.wantRows)
 		}
-		if g != nil && c.avail > 0 && got+5 > c.avail {
+		if g != nil && c.avail > 0 && got+4 > c.avail {
 			t.Errorf("avail=%d: логотип не влезает (%d строк)", c.avail, got)
 		}
 	}

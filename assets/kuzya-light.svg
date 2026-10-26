@@ -2,7 +2,7 @@
 <rect width="512" height="512" rx="112" fill="#E9EBEF"/>
 <!-- face and beard -->
 <g fill="#14968F">
-<path d="M140,214 H372 V340 A116,116 0 0 1 140,340 Z"/>
+<path d="M140,214 H372 V340 A116,86 0 0 1 140,340 Z"/>
 </g>
 <!-- hat: one cone with a fold and a drooping tip -->
 <g fill="#F2552C" stroke="#E9EBEF" stroke-width="6" stroke-linejoin="round">

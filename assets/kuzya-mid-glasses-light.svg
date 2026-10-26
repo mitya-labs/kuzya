@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><title>Kuzya</title>
 <rect width="512" height="512" rx="112" fill="#E9EBEF"/>
-<path fill="#14968F" d="M136,232 H376 V330 A120,120 0 0 1 136,330 Z"/>
+<path fill="#14968F" d="M136,232 H376 V330 A120,88 0 0 1 136,330 Z"/>
 <g fill="#F2552C" stroke="#E9EBEF" stroke-width="6" stroke-linejoin="round">
 <polygon points="92,240 420,240 306,118 262,56 226,66 200,118"/>
 <polygon points="262,56 306,118 400,150 338,80"/>
