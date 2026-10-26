@@ -37,7 +37,13 @@ func main() {
 		case "/reset", "/сброс":
 			a.Reset()
 			fmt.Println("Забыл.")
+		case "/help", "/?", "/помощь":
+			fmt.Println("/reset (/сброс) — забыть разговор, /exit (/quit, /выход) — выйти, Ctrl-D — тоже выход.")
 		default:
+			if strings.HasPrefix(line, "/") {
+				fmt.Println("Нет такой команды. /help — список.")
+				break
+			}
 			answer(a, line)
 		}
 		if err != nil {

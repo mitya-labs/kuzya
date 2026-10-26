@@ -5,6 +5,8 @@ import (
 	"io"
 	"os"
 	"strings"
+	"syscall"
+	"unsafe"
 )
 
 // logo — Кузя в пикселях: c — коралловый, t — бирюзовый, k — тёмный, точка — пусто.
@@ -83,16 +85,83 @@ func colorCode(ch byte, fg bool, truecolor bool) string {
 	return fmt.Sprintf("\x1b[%d;5;%dm", base, p.c256)
 }
 
-// printLogo рисует логотип; без терминала, с NO_COLOR или TERM=dumb не рисует ничего.
+// termRows возвращает число строк терминала или 0, если узнать не удалось.
+func termRows(f *os.File) int {
+	var ws struct{ Row, Col, X, Y uint16 }
+	_, _, e := syscall.Syscall(syscall.SYS_IOCTL, f.Fd(), uintptr(syscall.TIOCGWINSZ), uintptr(unsafe.Pointer(&ws)))
+	if e != 0 {
+		return 0
+	}
+	return int(ws.Row)
+}
+
+// shrink уменьшает сетку логотипа в k раз; тёмные пиксели (очки, глаза) весят больше, чтобы детали не пропадали.
+func shrink(rows []string, k int) []string {
+	if k <= 1 {
+		return rows
+	}
+	h, w := len(rows), len(rows[0])
+	var out []string
+	for y := 0; y < h; y += k {
+		var b strings.Builder
+		for x := 0; x < w; x += k {
+			cnt := map[byte]float64{}
+			total := 0
+			for dy := 0; dy < k && y+dy < h; dy++ {
+				for dx := 0; dx < k && x+dx < w; dx++ {
+					total++
+					ch := rows[y+dy][x+dx]
+					if ch == 'k' {
+						cnt[ch] += 1.5
+					} else {
+						cnt[ch]++
+					}
+				}
+			}
+			best, bestN := byte('.'), 0.0
+			for _, ch := range []byte{'c', 't', 'k', '.'} {
+				if cnt[ch] > bestN {
+					best, bestN = ch, cnt[ch]
+				}
+			}
+			if cnt['.'] > float64(total)/2 {
+				best = '.'
+			}
+			b.WriteByte(best)
+		}
+		out = append(out, b.String())
+	}
+	return out
+}
+
+// pickLogo выбирает размер логотипа под avail строк терминала (0 — неизвестно): целиком, если есть место,
+// иначе уменьшенный в 2–4 раза; nil, если места нет. Под логотипом остаются две строки текста, приглашение и запас.
+func pickLogo(avail int) []string {
+	const reserve = 5
+	full := strings.Split(strings.TrimRight(logo, "\n"), "\n")
+	for _, k := range []int{1, 2, 3, 4} {
+		g := shrink(full, k)
+		if len(g)%2 == 1 {
+			g = append(g, strings.Repeat(".", len(g[0])))
+		}
+		if avail == 0 || len(g)/2+reserve <= avail {
+			return g
+		}
+	}
+	return nil
+}
+
+// printLogo рисует логотип по размеру терминала: целиком, если есть место, иначе уменьшенный; без терминала,
+// с NO_COLOR, TERM=dumb или KUZYA_NOLOGO не рисует ничего. Под логотипом остаётся место на текст и приглашение.
 func printLogo(w io.Writer, f *os.File) {
 	if !isTerminal(f) || os.Getenv("NO_COLOR") != "" || os.Getenv("TERM") == "dumb" || os.Getenv("KUZYA_NOLOGO") != "" {
 		return
 	}
-	tc := trueColor()
-	rows := strings.Split(strings.TrimRight(logo, "\n"), "\n")
-	if len(rows)%2 == 1 {
-		rows = append(rows, strings.Repeat(".", len(rows[0])))
+	rows := pickLogo(termRows(f))
+	if rows == nil {
+		return
 	}
+	tc := trueColor()
 	for y := 0; y < len(rows); y += 2 {
 		var b strings.Builder
 		for x := 0; x < len(rows[y]); x++ {
