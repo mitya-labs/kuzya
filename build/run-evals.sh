@@ -4,10 +4,11 @@
 # Набор запросов: переменная CASES (по умолчанию cases.json).
 # Перед каждой моделью ждёт, пока батарея (qcom-battery) остынет ниже 45 °C. Во время прогона температуру не проверяет.
 cd "$HOME/kuzya" || exit 1
+# Не трогаем чужой сервер и не запускаем второй: две модели не помещаются в ОЗУ, телефон уходит в своп.
+if pgrep -x llama-server >/dev/null; then echo "llama-server уже запущен (Кузя в работе?): прогон отменён" >&2; exit 1; fi
 TAG=$1; [ $# -gt 0 ] && shift
 [ $# -eq 0 ] && set -- Qwen3.5-2B-Q4_K_M xLAM-2-1B-fc-r-Q4_K_M granite-4.1-3b-Q4_K_M gemma-4-E2B-it-Q4_K_M Qwen3.5-4B-Q4_K_M
 for m in "$@"; do
-  pkill llama-server; sleep 3
   while [ "$(for z in /sys/class/thermal/thermal_zone*; do [ "$(cat $z/type)" = qcom-battery ] && cat $z/temp; done)" -ge 45000 ]; do sleep 30; done
   t0=$(date +%s)
   ./bin/llama-server -m "models/$m.gguf" --jinja --chat-template-kwargs '{"enable_thinking":false}' \

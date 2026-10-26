@@ -158,6 +158,9 @@ func TestSysfsTools(t *testing.T) {
 	if string(b) != "2047" {
 		t.Errorf("brightness=%q, ждали 2047", b)
 	}
+	if out, err := run(t, "brightness_get", nil); err != nil || out != "яркость 50%" {
+		t.Errorf("brightness_get: out=%q err=%v", out, err)
+	}
 	if _, err := run(t, "brightness_set", map[string]any{"percent": 0.0}); err == nil {
 		t.Error("яркость 0% должна отклоняться (чёрный экран)")
 	}

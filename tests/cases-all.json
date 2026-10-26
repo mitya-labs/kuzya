@@ -951,5 +951,85 @@
   "args": {
    "unit": "bluetooth"
   }
+ },
+ {
+  "id": 137,
+  "q": "сделай ярче",
+  "tool": "brightness_get",
+  "args": {}
+ },
+ {
+  "id": 138,
+  "q": "потемнее",
+  "tool": "brightness_get",
+  "args": {}
+ },
+ {
+  "id": 139,
+  "q": "поярче пожалуйста, ничего не видно",
+  "tool": "brightness_get",
+  "args": {}
+ },
+ {
+  "id": 140,
+  "q": "чуть-чуть убавь яркость",
+  "tool": "brightness_get",
+  "args": {}
+ },
+ {
+  "id": 141,
+  "q": "сделай погромче",
+  "tool": "volume_get",
+  "args": {}
+ },
+ {
+  "id": 142,
+  "q": "потише",
+  "tool": "volume_get",
+  "args": {}
+ },
+ {
+  "id": 143,
+  "q": "прибавь звук",
+  "tool": "volume_get",
+  "args": {}
+ },
+ {
+  "id": 144,
+  "q": "слишком громко",
+  "tool": "volume_get",
+  "args": {}
+ },
+ {
+  "id": 145,
+  "q": "яркость 60",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 60
+  }
+ },
+ {
+  "id": 146,
+  "q": "громкость 70",
+  "tool": "volume_set",
+  "args": {
+   "percent": 70
+  }
+ },
+ {
+  "id": 147,
+  "q": "поставь яркость на максимум",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 100
+  }
+ },
+ {
+  "id": 148,
+  "q": "сделай яркость 25 процентов",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 25
+  }
  }
 ]

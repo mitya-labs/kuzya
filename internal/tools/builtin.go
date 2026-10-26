@@ -165,7 +165,7 @@ func init() {
 
 	Register(Tool{
 		Name:        "volume_set",
-		Description: "Установить громкость звука в процентах (0–100): «громкость», «потише», «погромче». Не яркость экрана.",
+		Description: "Установить громкость звука в процентах (0–100): «громкость 40», «громкость на максимум». Если просят «потише» или «погромче» без числа, сначала вызови volume_get и выбери значение на 10–20 пунктов меньше или больше. Не яркость экрана.",
 		Params:      map[string]any{"percent": num("громкость, 0–100")},
 		Required:    []string{"percent"},
 		Dangerous:   true,
@@ -186,8 +186,29 @@ func init() {
 	})
 
 	Register(Tool{
+		Name:        "brightness_get",
+		Description: "Текущая яркость экрана в процентах. Нужна, когда просят «ярче» или «темнее» без числа.",
+		Run: func(map[string]any) (string, error) {
+			cur, err := readFirst("class/backlight/*/brightness")
+			if err != nil {
+				return "", err
+			}
+			max, err := readFirst("class/backlight/*/max_brightness")
+			if err != nil {
+				return "", err
+			}
+			c, err1 := strconv.Atoi(cur)
+			m, err2 := strconv.Atoi(max)
+			if err1 != nil || err2 != nil || m <= 0 {
+				return "", fmt.Errorf("не прочитал яркость: %q из %q", cur, max)
+			}
+			return fmt.Sprintf("яркость %d%%", (c*100+m/2)/m), nil
+		},
+	})
+
+	Register(Tool{
 		Name:        "brightness_set",
-		Description: "Установить яркость экрана (подсветки) в процентах (5–100): «яркость», «ярче», «темнее». Не громкость звука.",
+		Description: "Установить яркость экрана (подсветки) в процентах (5–100): «яркость 60», «яркость на максимум». Если просят «ярче» или «темнее» без числа, сначала вызови brightness_get и выбери значение на 20 пунктов больше или меньше. Не громкость звука.",
 		Params:      map[string]any{"percent": num("яркость, 5–100")},
 		Required:    []string{"percent"},
 		Dangerous:   true,
