@@ -2,7 +2,7 @@
 <rect width="512" height="512" rx="112" fill="#0D0E15"/>
 <!-- face and beard -->
 <g fill="#5EEADB">
-<polygon points="140,214 372,214 372,336 356,386 256,462 156,386 140,336"/>
+<path d="M140,214 H372 V340 A116,116 0 0 1 140,340 Z"/>
 </g>
 <!-- hat: one cone with a fold and a drooping tip -->
 <g fill="#FF6B5A" stroke="#0D0E15" stroke-width="6" stroke-linejoin="round">
@@ -12,7 +12,6 @@
 <!-- folds -->
 <g fill="none" stroke="#0D0E15" stroke-width="6" stroke-linecap="round">
 <path d="M256,224 V124"/>
-<path d="M198,340 V404 M256,340 V458 M314,340 V404"/>
 </g>
 <!-- cheeks -->
 <g fill="#FF6B5A">
