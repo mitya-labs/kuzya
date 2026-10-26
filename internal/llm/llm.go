@@ -45,7 +45,7 @@ func New() *Client {
 // Chat отправляет историю и схемы инструментов, возвращает ответ модели.
 func (c *Client) Chat(msgs []Message, tools []map[string]any) (Message, error) {
 	// max_tokens: ответ с вызовом инструмента короткий; предел отсекает зацикленную генерацию (были запросы по 155–300 с).
-	body := map[string]any{"messages": msgs, "temperature": 0.2, "max_tokens": 256}
+	body := map[string]any{"messages": msgs, "temperature": 0, "max_tokens": 256}
 	if len(tools) > 0 {
 		body["tools"] = tools
 	}
