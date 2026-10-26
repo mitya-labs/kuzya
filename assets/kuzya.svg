@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><title>Kuzya</title>
+<rect width="512" height="512" rx="112" fill="#0D0E15"/>
+<!-- face and beard -->
+<g fill="#5EEADB">
+<polygon points="140,214 372,214 372,336 356,386 256,462 156,386 140,336"/>
+</g>
+<!-- hat: one cone with a fold and a drooping tip -->
+<g fill="#FF6B5A" stroke="#0D0E15" stroke-width="6" stroke-linejoin="round">
+<polygon points="104,224 408,224 313,120 270,50 232,60 199,120"/>
+<polygon points="270,50 313,120 396,150 340,76"/>
+</g>
+<!-- folds -->
+<g fill="none" stroke="#0D0E15" stroke-width="6" stroke-linecap="round">
+<path d="M256,224 V124"/>
+<path d="M198,340 V404 M256,340 V458 M314,340 V404"/>
+</g>
+<!-- cheeks -->
+<g fill="#FF6B5A">
+<circle cx="170" cy="304" r="17"/>
+<circle cx="342" cy="304" r="17"/>
+</g>
+<!-- brows and smile -->
+<g fill="none" stroke="#0D0E15" stroke-width="9" stroke-linecap="round">
+<path d="M178,246 Q204,230 230,246"/>
+<path d="M282,246 Q308,230 334,246"/>
+<path d="M232,318 Q256,340 280,318"/>
+</g>
+<!-- eyes -->
+<g fill="#0D0E15">
+<circle cx="204" cy="274" r="22"/>
+<circle cx="308" cy="274" r="22"/>
+</g>
+<g fill="#5EEADB">
+<circle cx="211" cy="266" r="7"/>
+<circle cx="315" cy="266" r="7"/>
+</g>
+<!-- hex nose, nod to the Mitya Labs mark -->
+<polygon fill="#0D0E15" points="256,284 268,291 268,305 256,312 244,305 244,291"/>
+</svg>

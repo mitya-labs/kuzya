@@ -1,0 +1,955 @@
+[
+ {
+  "id": 1,
+  "q": "какой заряд батареи?",
+  "tool": "battery_status",
+  "args": {}
+ },
+ {
+  "id": 2,
+  "q": "сколько процентов осталось на телефоне?",
+  "tool": "battery_status",
+  "args": {}
+ },
+ {
+  "id": 3,
+  "q": "телефон сейчас заряжается?",
+  "tool": "battery_status",
+  "args": {}
+ },
+ {
+  "id": 4,
+  "q": "батарея садится, сколько там?",
+  "tool": "battery_status",
+  "args": {}
+ },
+ {
+  "id": 5,
+  "q": "я подключён к вайфаю?",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 6,
+  "q": "какие wi-fi сети у меня сохранены?",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 7,
+  "q": "что с интернетом, к чему подключён телефон?",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 8,
+  "q": "подключись к Keenetic-9135",
+  "tool": "wifi_connect",
+  "args": {
+   "connection": "Keenetic-9135"
+  }
+ },
+ {
+  "id": 9,
+  "q": "переключи вайфай на сеть Keenetic-9135",
+  "tool": "wifi_connect",
+  "args": {
+   "connection": "Keenetic-9135"
+  }
+ },
+ {
+  "id": 10,
+  "q": "connect wifi Keenetic-9135",
+  "tool": "wifi_connect",
+  "args": {
+   "connection": "Keenetic-9135"
+  }
+ },
+ {
+  "id": 11,
+  "q": "какие сервисы сейчас запущены?",
+  "tool": "services_running",
+  "args": {}
+ },
+ {
+  "id": 12,
+  "q": "покажи работающие службы",
+  "tool": "services_running",
+  "args": {}
+ },
+ {
+  "id": 13,
+  "q": "что у меня сейчас крутится в systemd?",
+  "tool": "services_running",
+  "args": {}
+ },
+ {
+  "id": 14,
+  "q": "покажи логи NetworkManager",
+  "tool": "service_logs",
+  "args": {
+   "unit": "NetworkManager"
+  }
+ },
+ {
+  "id": 15,
+  "q": "что в журнале bluetooth за последнее время?",
+  "tool": "service_logs",
+  "args": {
+   "unit": "bluetooth"
+  }
+ },
+ {
+  "id": 16,
+  "q": "покажи последние 50 строк лога ModemManager",
+  "tool": "service_logs",
+  "args": {
+   "unit": "ModemManager",
+   "lines": 50
+  }
+ },
+ {
+  "id": 17,
+  "q": "вайфай отваливается, глянь логи NetworkManager",
+  "tool": "service_logs",
+  "args": {
+   "unit": "NetworkManager"
+  }
+ },
+ {
+  "id": 18,
+  "q": "перезапусти NetworkManager",
+  "tool": "service_restart",
+  "args": {
+   "unit": "NetworkManager"
+  }
+ },
+ {
+  "id": 19,
+  "q": "перезагрузи службу bluetooth",
+  "tool": "service_restart",
+  "args": {
+   "unit": "bluetooth"
+  }
+ },
+ {
+  "id": 20,
+  "q": "рестартни ModemManager",
+  "tool": "service_restart",
+  "args": {
+   "unit": "ModemManager"
+  }
+ },
+ {
+  "id": 21,
+  "q": "запрети телефону засыпать",
+  "tool": "nosleep_set",
+  "args": {
+   "mode": "on"
+  }
+ },
+ {
+  "id": 22,
+  "q": "включи nosleep",
+  "tool": "nosleep_set",
+  "args": {
+   "mode": "on"
+  }
+ },
+ {
+  "id": 23,
+  "q": "разреши телефону снова спать",
+  "tool": "nosleep_set",
+  "args": {
+   "mode": "off"
+  }
+ },
+ {
+  "id": 24,
+  "q": "какая сейчас громкость?",
+  "tool": "volume_get",
+  "args": {}
+ },
+ {
+  "id": 25,
+  "q": "на сколько процентов стоит громкость?",
+  "tool": "volume_get",
+  "args": {}
+ },
+ {
+  "id": 26,
+  "q": "поставь громкость 30",
+  "tool": "volume_set",
+  "args": {
+   "percent": 30
+  }
+ },
+ {
+  "id": 27,
+  "q": "сделай звук на 80 процентов",
+  "tool": "volume_set",
+  "args": {
+   "percent": 80
+  }
+ },
+ {
+  "id": 28,
+  "q": "громкость на максимум",
+  "tool": "volume_set",
+  "args": {
+   "percent": 100
+  }
+ },
+ {
+  "id": 29,
+  "q": "выключи звук",
+  "tool": "mute_set",
+  "args": {
+   "mode": "on"
+  }
+ },
+ {
+  "id": 30,
+  "q": "включи звук обратно",
+  "tool": "mute_set",
+  "args": {
+   "mode": "off"
+  }
+ },
+ {
+  "id": 31,
+  "q": "заглуши телефон",
+  "tool": "mute_set",
+  "args": {
+   "mode": "on"
+  }
+ },
+ {
+  "id": 32,
+  "q": "поставь яркость 50",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 50
+  }
+ },
+ {
+  "id": 33,
+  "q": "сделай экран поярче, на 90 процентов",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 90
+  }
+ },
+ {
+  "id": 34,
+  "q": "яркость на 10 процентов",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 10
+  }
+ },
+ {
+  "id": 35,
+  "q": "привет, как дела?",
+  "tool": "",
+  "args": {}
+ },
+ {
+  "id": 36,
+  "q": "расскажи анекдот",
+  "tool": "",
+  "args": {}
+ },
+ {
+  "id": 37,
+  "q": "перезапусти ssh",
+  "tool": "",
+  "args": {}
+ },
+ {
+  "id": 38,
+  "q": "удали все файлы в домашней папке",
+  "tool": "",
+  "args": {}
+ },
+ {
+  "id": 39,
+  "q": "покажи логи sshd",
+  "tool": "",
+  "args": {}
+ },
+ {
+  "id": 40,
+  "q": "какая погода в Москве?",
+  "tool": "",
+  "args": {}
+ },
+ {
+  "id": 41,
+  "q": "слышь, че там по батарейке, надолго хватит?",
+  "tool": "battery_status",
+  "args": {}
+ },
+ {
+  "id": 42,
+  "q": "скока заряда щас",
+  "tool": "battery_status",
+  "args": {}
+ },
+ {
+  "id": 43,
+  "q": "батерея ещё живая или уже пора втыкать в розетку",
+  "tool": "battery_status",
+  "args": {}
+ },
+ {
+  "id": 44,
+  "q": "battery level pls",
+  "tool": "battery_status",
+  "args": {}
+ },
+ {
+  "id": 45,
+  "q": "есть интернет по вайфаю или опять отвалился",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 46,
+  "q": "к какой сети я сейчас присосался",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 47,
+  "q": "покажи вафлю",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 48,
+  "q": "подключись к вайфаю Keenetic-9135, дома надо нормальный интернет",
+  "tool": "wifi_connect",
+  "args": {
+   "connection": "Keenetic-9135"
+  }
+ },
+ {
+  "id": 49,
+  "q": "connect to Keenetic-9135",
+  "tool": "wifi_connect",
+  "args": {
+   "connection": "Keenetic-9135"
+  }
+ },
+ {
+  "id": 50,
+  "q": "перекинь меня на Keenetic-9135 пожалуйста",
+  "tool": "wifi_connect",
+  "args": {
+   "connection": "Keenetic-9135"
+  }
+ },
+ {
+  "id": 51,
+  "q": "че сейчас вообще крутится в системе",
+  "tool": "services_running",
+  "args": {}
+ },
+ {
+  "id": 52,
+  "q": "какие демоны запущены",
+  "tool": "services_running",
+  "args": {}
+ },
+ {
+  "id": 53,
+  "q": "глянь логи NetworkManager, интернет что-то глючит",
+  "tool": "service_logs",
+  "args": {
+   "unit": "NetworkManager"
+  }
+ },
+ {
+  "id": 54,
+  "q": "покажи последние 100 строк журнала блютуза",
+  "tool": "service_logs",
+  "args": {
+   "unit": "bluetooth",
+   "lines": 100
+  }
+ },
+ {
+  "id": 55,
+  "q": "чё пишет ModemManager",
+  "tool": "service_logs",
+  "args": {
+   "unit": "ModemManager"
+  }
+ },
+ {
+  "id": 56,
+  "q": "логи bluetooth, штук двадцать строк",
+  "tool": "service_logs",
+  "args": {
+   "unit": "bluetooth",
+   "lines": 20
+  }
+ },
+ {
+  "id": 57,
+  "q": "вайфай завис, перезапусти NetworkManager",
+  "tool": "service_restart",
+  "args": {
+   "unit": "NetworkManager"
+  }
+ },
+ {
+  "id": 58,
+  "q": "рестартани блютуз, он не видит наушники",
+  "tool": "service_restart",
+  "args": {
+   "unit": "bluetooth"
+  }
+ },
+ {
+  "id": 59,
+  "q": "перезагрузи службу ModemManager",
+  "tool": "service_restart",
+  "args": {
+   "unit": "ModemManager"
+  }
+ },
+ {
+  "id": 60,
+  "q": "не давай экрану гаснуть, я читаю",
+  "tool": "nosleep_set",
+  "args": {
+   "mode": "on"
+  }
+ },
+ {
+  "id": 61,
+  "q": "запрети телефону засыпать, идёт загрузка",
+  "tool": "nosleep_set",
+  "args": {
+   "mode": "on"
+  }
+ },
+ {
+  "id": 62,
+  "q": "всё, можно снова спать, nosleep выключи",
+  "tool": "nosleep_set",
+  "args": {
+   "mode": "off"
+  }
+ },
+ {
+  "id": 63,
+  "q": "а теперь разреши телефону засыпать",
+  "tool": "nosleep_set",
+  "args": {
+   "mode": "off"
+  }
+ },
+ {
+  "id": 64,
+  "q": "громкость сколько стоит",
+  "tool": "volume_get",
+  "args": {}
+ },
+ {
+  "id": 65,
+  "q": "звук громко или тихо сейчас",
+  "tool": "volume_get",
+  "args": {}
+ },
+ {
+  "id": 66,
+  "q": "сделай потише, процентов 15",
+  "tool": "volume_set",
+  "args": {
+   "percent": 15
+  }
+ },
+ {
+  "id": 67,
+  "q": "громкость на половину",
+  "tool": "volume_set",
+  "args": {
+   "percent": 50
+  }
+ },
+ {
+  "id": 68,
+  "q": "ставь звук на 70, а то не слышу",
+  "tool": "volume_set",
+  "args": {
+   "percent": 70
+  }
+ },
+ {
+  "id": 69,
+  "q": "заглуши звук, совещание",
+  "tool": "mute_set",
+  "args": {
+   "mode": "on"
+  }
+ },
+ {
+  "id": 70,
+  "q": "верни звук, совещание кончилось",
+  "tool": "mute_set",
+  "args": {
+   "mode": "off"
+  }
+ },
+ {
+  "id": 71,
+  "q": "mute",
+  "tool": "mute_set",
+  "args": {
+   "mode": "on"
+  }
+ },
+ {
+  "id": 72,
+  "q": "экран слишком яркий, убавь до 20",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 20
+  }
+ },
+ {
+  "id": 73,
+  "q": "поставь яркость максимум",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 100
+  }
+ },
+ {
+  "id": 74,
+  "q": "подсветку на 40 процентов, глаза режет",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 40
+  }
+ },
+ {
+  "id": 75,
+  "q": "напиши мне стих про осень",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 76,
+  "q": "перезапусти sshd и покажи его логи",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 77,
+  "q": "сотри логи и переустанови систему",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 78,
+  "q": "поставь будильник на семь утра",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 79,
+  "q": "включи bluetooth и подключи колонку",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 80,
+  "q": "кто ты и что умеешь?",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 81,
+  "q": "скока зарад у тефона",
+  "tool": "battery_status",
+  "args": {}
+ },
+ {
+  "id": 82,
+  "q": "а батарея там как вообще, зарядка идёт?",
+  "tool": "battery_status",
+  "args": {}
+ },
+ {
+  "id": 83,
+  "q": "wifi какой сейчас активный",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 84,
+  "q": "как называется сеть, к которой я подключен",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 85,
+  "q": "переподключись к Keenetic-9135",
+  "tool": "wifi_connect",
+  "args": {
+   "connection": "Keenetic-9135"
+  }
+ },
+ {
+  "id": 86,
+  "q": "Keenetic-9135 включи пожалуйста",
+  "tool": "wifi_connect",
+  "args": {
+   "connection": "Keenetic-9135"
+  }
+ },
+ {
+  "id": 87,
+  "q": "что запущено на телефоне из служб",
+  "tool": "services_running",
+  "args": {}
+ },
+ {
+  "id": 88,
+  "q": "последние 200 строк журнала ModemManager",
+  "tool": "service_logs",
+  "args": {
+   "unit": "ModemManager",
+   "lines": 200
+  }
+ },
+ {
+  "id": 89,
+  "q": "посмотри что пишет systemd-resolved",
+  "tool": "service_logs",
+  "args": {
+   "unit": "systemd-resolved"
+  }
+ },
+ {
+  "id": 90,
+  "q": "avahi-daemon логи покажи, штук 15",
+  "tool": "service_logs",
+  "args": {
+   "unit": "avahi-daemon",
+   "lines": 15
+  }
+ },
+ {
+  "id": 91,
+  "q": "перезапусти power-profiles-daemon",
+  "tool": "service_restart",
+  "args": {
+   "unit": "power-profiles-daemon"
+  }
+ },
+ {
+  "id": 92,
+  "q": "systemd-timesyncd перезапусти, время сбилось",
+  "tool": "service_restart",
+  "args": {
+   "unit": "systemd-timesyncd"
+  }
+ },
+ {
+  "id": 93,
+  "q": "перезагрузи службу блютуз",
+  "tool": "service_restart",
+  "args": {
+   "unit": "bluetooth"
+  }
+ },
+ {
+  "id": 94,
+  "q": "я сейчас буду долго качать, не засыпай",
+  "tool": "nosleep_set",
+  "args": {
+   "mode": "on"
+  }
+ },
+ {
+  "id": 95,
+  "q": "теперь можешь снова засыпать",
+  "tool": "nosleep_set",
+  "args": {
+   "mode": "off"
+  }
+ },
+ {
+  "id": 96,
+  "q": "какой уровень звука?",
+  "tool": "volume_get",
+  "args": {}
+ },
+ {
+  "id": 97,
+  "q": "громкость 80",
+  "tool": "volume_set",
+  "args": {
+   "percent": 80
+  }
+ },
+ {
+  "id": 98,
+  "q": "тише, поставь десять процентов",
+  "tool": "volume_set",
+  "args": {
+   "percent": 10
+  }
+ },
+ {
+  "id": 99,
+  "q": "отключи звук совсем",
+  "tool": "mute_set",
+  "args": {
+   "mode": "on"
+  }
+ },
+ {
+  "id": 100,
+  "q": "размуть",
+  "tool": "mute_set",
+  "args": {
+   "mode": "off"
+  }
+ },
+ {
+  "id": 101,
+  "q": "яркость 60",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 60
+  }
+ },
+ {
+  "id": 102,
+  "q": "сделай экран потемнее, на 15",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 15
+  }
+ },
+ {
+  "id": 103,
+  "q": "включи вайфай",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 104,
+  "q": "выключи вайфай",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 105,
+  "q": "какая температура процессора?",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 106,
+  "q": "сколько свободно места на диске?",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 107,
+  "q": "обнови систему",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 108,
+  "q": "позвони маме",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 109,
+  "q": "который час?",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 110,
+  "q": "включи фонарик",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 111,
+  "q": "перезапусти все службы",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 112,
+  "q": "покажи логи ssh",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 113,
+  "q": "останови NetworkManager",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 114,
+  "q": "выключи телефон",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 115,
+  "q": "сделай скриншот",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 116,
+  "q": "переведи на английский: добрый день",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 117,
+  "q": "сколько будет 17 умножить на 23?",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 118,
+  "q": "установи программу htop",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 119,
+  "q": "измени пароль пользователя",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 120,
+  "q": "отправь сообщение в телеграм",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 121,
+  "q": "поставь таймер на 5 минут",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 122,
+  "q": "найди рецепт борща",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 123,
+  "q": "открой браузер",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 124,
+  "q": "какой сегодня день недели?",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 125,
+  "q": "очисти кэш",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 126,
+  "q": "включи режим полёта",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 127,
+  "q": "подключись к блютуз колонке",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 128,
+  "q": "сколько оперативной памяти свободно?",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 129,
+  "q": "сделай резервную копию",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 130,
+  "q": "поменяй обои",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 131,
+  "q": "покажи заряд в процентах",
+  "tool": "battery_status",
+  "args": {}
+ },
+ {
+  "id": 132,
+  "q": "уменьши яркость до 30",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 30
+  }
+ },
+ {
+  "id": 133,
+  "q": "включи звук на 45",
+  "tool": "volume_set",
+  "args": {
+   "percent": 45
+  }
+ },
+ {
+  "id": 134,
+  "q": "что пишет журнал блютуза",
+  "tool": "service_logs",
+  "args": {
+   "unit": "bluetooth"
+  }
+ },
+ {
+  "id": 135,
+  "q": "переключись на сеть Keenetic-9135",
+  "tool": "wifi_connect",
+  "args": {
+   "connection": "Keenetic-9135"
+  }
+ },
+ {
+  "id": 136,
+  "q": "блютуз перезапусти",
+  "tool": "service_restart",
+  "args": {
+   "unit": "bluetooth"
+  }
+ }
+]

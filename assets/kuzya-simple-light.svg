@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><title>Kuzya</title>
+<rect width="512" height="512" rx="112" fill="#E9EBEF"/>
+<polygon fill="#14968F" points="146,236 366,236 366,330 256,454 146,330"/>
+<polygon fill="#F2552C" points="96,236 416,236 256,58"/>
+<g fill="#14151C">
+<circle cx="208" cy="290" r="20"/>
+<circle cx="304" cy="290" r="20"/>
+</g>
+<path d="M226,336 Q256,364 286,336" fill="none" stroke="#14151C" stroke-width="12" stroke-linecap="round"/>
+</svg>

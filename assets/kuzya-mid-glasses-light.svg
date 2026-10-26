@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><title>Kuzya</title>
+<rect width="512" height="512" rx="112" fill="#E9EBEF"/>
+<polygon fill="#14968F" points="136,232 376,232 376,324 256,458 136,324"/>
+<g fill="#F2552C" stroke="#E9EBEF" stroke-width="6" stroke-linejoin="round">
+<polygon points="92,240 420,240 306,118 262,56 226,66 200,118"/>
+<polygon points="262,56 306,118 400,150 338,80"/>
+</g>
+<g fill="#F2552C">
+<circle cx="170" cy="340" r="14"/>
+<circle cx="342" cy="340" r="14"/>
+</g>
+<g fill="#14151C">
+<circle cx="206" cy="288" r="22"/>
+<circle cx="306" cy="288" r="22"/>
+</g>
+<g fill="#F4F5F8">
+<circle cx="213" cy="280" r="7"/>
+<circle cx="313" cy="280" r="7"/>
+</g>
+<g fill="none" stroke="#14151C" stroke-width="9" stroke-linecap="round">
+<path d="M230,336 Q256,358 282,336"/>
+</g>
+<!-- thin glasses frame -->
+<g fill="none" stroke="#14151C" stroke-width="6" stroke-linecap="round">
+<circle cx="206" cy="288" r="36"/>
+<circle cx="306" cy="288" r="36"/>
+<path d="M242,282 Q256,274 270,282"/>
+<path d="M170,282 L138,276"/>
+<path d="M342,282 L374,276"/>
+</g>
+<!-- hair wisps under the hat -->
+<g fill="none" stroke="#14968F" stroke-width="7" stroke-linecap="round">
+<path d="M122,246 Q100,292 126,338"/>
+<path d="M390,246 Q412,292 386,338"/>
+</g>
+</svg>

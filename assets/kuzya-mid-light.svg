@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><title>Kuzya</title>
+<rect width="512" height="512" rx="112" fill="#E9EBEF"/>
+<polygon fill="#14968F" points="136,232 376,232 376,324 256,458 136,324"/>
+<g fill="#F2552C" stroke="#E9EBEF" stroke-width="6" stroke-linejoin="round">
+<polygon points="92,240 420,240 306,118 262,56 226,66 200,118"/>
+<polygon points="262,56 306,118 400,150 338,80"/>
+</g>
+<g fill="#F2552C">
+<circle cx="172" cy="318" r="16"/>
+<circle cx="340" cy="318" r="16"/>
+</g>
+<g fill="#14151C">
+<circle cx="206" cy="288" r="22"/>
+<circle cx="306" cy="288" r="22"/>
+</g>
+<g fill="#F4F5F8">
+<circle cx="213" cy="280" r="7"/>
+<circle cx="313" cy="280" r="7"/>
+</g>
+<g fill="none" stroke="#14151C" stroke-width="9" stroke-linecap="round">
+<path d="M230,332 Q256,354 282,332"/>
+</g>
+</svg>
