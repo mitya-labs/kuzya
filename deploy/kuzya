@@ -1,9 +1,11 @@
 #!/bin/sh
 # Команда `kuzya` для терминала: поднимает сервер (с кэшем промпта), запускает Кузю, останавливает сервер.
+# Сервер останавливается только если запустили его мы (чужой запущенный сервер не трогаем), в том числе при Ctrl-C.
 # Ставится в ~/.local/bin/kuzya; программа и сервер лежат в ~/kuzya.
 KH="${KUZYA_HOME:-$HOME/kuzya}"
+if "$KH/kuzya-server" status >/dev/null 2>&1; then OWN=0; else OWN=1; fi
+cleanup() { [ "$OWN" = 1 ] && "$KH/kuzya-server" stop; }
+trap cleanup EXIT
+trap 'exit 130' INT TERM HUP
 "$KH/kuzya-server" start || exit 1
 "$KH/bin/kuzya" "$@"
-rc=$?
-"$KH/kuzya-server" stop
-exit $rc

@@ -41,7 +41,7 @@ case "${1:-start}" in
 		rm -f "$PIDFILE"
 		;;
 	status)
-		if up; then echo "работает"; else echo "остановлен"; fi
+		if up; then echo "работает"; else echo "остановлен"; exit 1; fi
 		;;
 	*) echo "использование: kuzya-server start|stop|status" >&2; exit 2 ;;
 esac
