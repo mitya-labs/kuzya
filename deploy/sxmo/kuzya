@@ -1,0 +1,7 @@
+#!/bin/sh
+# title="Кузя"
+# Пункт меню SXMO «Scripts»: открывает терминал с Кузей. Сервер поднимается по требованию и останавливается после выхода.
+# Запуск из сессии SXMO нужен, чтобы nmcli (wifi_connect) имел право управлять NetworkManager (polkit: локальная активная сессия).
+# Ставится в ~/.config/sxmo/userscripts/kuzya; программа и сервер лежат в ~/kuzya.
+KH="${KUZYA_HOME:-$HOME/kuzya}"
+exec sxmo_terminal.sh sh -c "\"$KH/kuzya-server\" start && \"$KH/bin/kuzya\"; \"$KH/kuzya-server\" stop"

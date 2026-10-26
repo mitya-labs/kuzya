@@ -23,16 +23,18 @@ func main() {
 		answer(a, strings.Join(os.Args[1:], " "))
 		return
 	}
-	fmt.Println("Кузя. /сброс — забыть разговор, /выход — выйти.")
+	printLogo(os.Stdout, os.Stdout)
+	fmt.Println("Кузя, домовой skladenOS")
+	fmt.Println("/reset — забыть разговор, /exit — выйти")
 	for {
 		fmt.Print("> ")
 		line, err := in.ReadString('\n')
 		line = strings.TrimSpace(line)
 		switch line {
 		case "":
-		case "/выход", "/exit":
+		case "/exit", "/quit", "/выход":
 			return
-		case "/сброс", "/reset":
+		case "/reset", "/сброс":
 			a.Reset()
 			fmt.Println("Забыл.")
 		default:

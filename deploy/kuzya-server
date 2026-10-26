@@ -1,0 +1,47 @@
+#!/bin/sh
+# Управление llama-server для Кузи: kuzya-server start|stop|status
+# start: поднимает сервер (если не запущен), восстанавливает кэш промпта слота;
+#        если файла кэша нет — один раз прогревает сервер запросом и сохраняет кэш.
+# Кэш относится к модели, флагам, системному промпту и схемам инструментов; при смене промпта/инструментов
+# удалить $KUZYA_HOME/slots/*.bin (при несовпадении префикса сервер пересчитает только расхождение).
+KH="${KUZYA_HOME:-$HOME/kuzya}"
+MODEL="${KUZYA_MODEL:-gemma-4-E2B-it-Q4_K_M}"
+URL="http://127.0.0.1:8080"
+SLOT="$MODEL.bin"
+PIDFILE="$KH/server.pid"
+
+up() { curl -sf "$URL/health" >/dev/null 2>&1; }
+
+case "${1:-start}" in
+	start)
+		up && exit 0
+		mkdir -p "$KH/slots"
+		setsid nohup "$KH/bin/llama-server" -m "$KH/models/$MODEL.gguf" --jinja \
+			--chat-template-kwargs '{"enable_thinking":false}' -t 4 -c 4096 \
+			--host 127.0.0.1 --port 8080 --slot-save-path "$KH/slots" \
+			> "$KH/server.log" 2>&1 < /dev/null &
+		echo $! > "$PIDFILE"
+		n=0; until up; do
+			n=$((n+1)); [ "$n" -gt 120 ] && { echo "сервер не поднялся, см. $KH/server.log" >&2; exit 1; }
+			sleep 1
+		done
+		if [ -f "$KH/slots/$SLOT" ]; then
+			curl -sf -X POST "$URL/slots/0?action=restore" -H 'Content-Type: application/json' \
+				-d "{\"filename\":\"$SLOT\"}" >/dev/null || echo "кэш не восстановлен, будет пересчёт" >&2
+		else
+			echo "Первый запуск: прогрев кэша промпта (около 2 минут)..." >&2
+			echo '[{"id":1,"q":"какой заряд батареи?","tool":"battery_status","args":{}}]' > "$KH/slots/warm.json"
+			"$KH/bin/kuzya-eval" -cases "$KH/slots/warm.json" >/dev/null 2>&1
+			curl -sf -X POST "$URL/slots/0?action=save" -H 'Content-Type: application/json' \
+				-d "{\"filename\":\"$SLOT\"}" >/dev/null || echo "кэш не сохранён" >&2
+		fi
+		;;
+	stop)
+		[ -f "$PIDFILE" ] && kill "$(cat "$PIDFILE")" 2>/dev/null
+		rm -f "$PIDFILE"
+		;;
+	status)
+		if up; then echo "работает"; else echo "остановлен"; fi
+		;;
+	*) echo "использование: kuzya-server start|stop|status" >&2; exit 2 ;;
+esac
