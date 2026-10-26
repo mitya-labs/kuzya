@@ -118,11 +118,11 @@ func TestVolumeAndMute(t *testing.T) {
 		t.Errorf("args=%q", got)
 	}
 	*calls = nil
-	if _, err := run(t, "volume_set", map[string]any{"delta": -10.0}); err != nil {
+	if _, err := run(t, "volume_step", map[string]any{"direction": "down"}); err != nil {
 		t.Fatal(err)
 	}
 	if got := strings.Join((*calls)[1].args, " "); got != "set-volume @DEFAULT_AUDIO_SINK@ 30%" {
-		t.Errorf("delta -10 от 40%%: args=%q", got)
+		t.Errorf("down от 40%%: args=%q", got)
 	}
 	if _, err := run(t, "volume_set", map[string]any{"percent": 150.0}); err == nil {
 		t.Error("150% должно отклоняться")
@@ -165,18 +165,18 @@ func TestSysfsTools(t *testing.T) {
 	if string(b) != "2047" {
 		t.Errorf("brightness=%q, ждали 2047", b)
 	}
-	// delta: от текущих 50% (2047/4095) на +20 → 70%; на -100 не ниже 5%
-	if out, err := run(t, "brightness_set", map[string]any{"delta": 20.0}); err != nil || out != "яркость 70%" {
-		t.Errorf("delta +20: out=%q err=%v", out, err)
+	// step: от текущих 50% (2047/4095) вверх на 20 → 70%; вниз на 20 → 50%, не ниже 5%
+	if out, err := run(t, "brightness_step", map[string]any{"direction": "up"}); err != nil || out != "яркость 70%" {
+		t.Errorf("step up: out=%q err=%v", out, err)
 	}
-	if out, err := run(t, "brightness_set", map[string]any{"delta": -100.0}); err != nil || out != "яркость 5%" {
-		t.Errorf("delta -100: out=%q err=%v", out, err)
+	if out, err := run(t, "brightness_step", map[string]any{"direction": "down"}); err != nil || out != "яркость 50%" {
+		t.Errorf("step down: out=%q err=%v", out, err)
 	}
-	if _, err := run(t, "brightness_set", map[string]any{"percent": 50.0, "delta": 5.0}); err == nil {
-		t.Error("percent вместе с delta должно отклоняться")
+	if _, err := run(t, "brightness_step", map[string]any{"direction": "sideways"}); err == nil {
+		t.Error("direction не up/down должно отклоняться")
 	}
 	if _, err := run(t, "brightness_set", nil); err == nil {
-		t.Error("без percent и delta должно отклоняться")
+		t.Error("без percent должно отклоняться")
 	}
 	if _, err := run(t, "brightness_set", map[string]any{"percent": 0.0}); err == nil {
 		t.Error("яркость 0% должна отклоняться (чёрный экран)")

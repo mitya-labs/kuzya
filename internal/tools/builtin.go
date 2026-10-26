@@ -165,68 +165,123 @@ func init() {
 
 	Register(Tool{
 		Name:        "volume_set",
-		Description: "Установить громкость звука: percent — значение 0–100 («громкость 40», «на половину», «на максимум»); delta — сдвиг от текущей громкости («погромче» +10, «потише» −10). Не яркость экрана.",
-		Params: map[string]any{
-			"percent": num("громкость, 0–100"),
-			"delta":   num("сдвиг в процентных пунктах: плюс — громче, минус — тише"),
-		},
-		Dangerous: true,
+		Description: "Установить громкость звука в процентах (0–100): «громкость 40», «на половину», «на максимум». Не яркость экрана.",
+		Params:      map[string]any{"percent": num("громкость, 0–100")},
+		Required:    []string{"percent"},
+		Dangerous:   true,
 		Run: func(args map[string]any) (string, error) {
-			p, err := levelArg(args, 0, 100, volumePercent)
+			p, err := intArg(args, "percent", 0, 100)
 			if err != nil {
 				return "", err
 			}
-			if _, err := execCmd("wpctl", "set-volume", sink, strconv.Itoa(p)+"%"); err != nil {
-				return "", err
-			}
-			out, err := execCmd("wpctl", "get-volume", sink)
+			return setVolume(p)
+		},
+	})
+
+	Register(Tool{
+		Name:        "volume_step",
+		Description: "Сделать звук громче или тише на шаг, когда число не названо: «погромче», «потише». Не яркость экрана.",
+		Params:      map[string]any{"direction": str("up — громче, down — тише")},
+		Required:    []string{"direction"},
+		Dangerous:   true,
+		Run: func(args map[string]any) (string, error) {
+			d, err := stepArg(args, 10)
 			if err != nil {
 				return "", err
 			}
-			return volumeInfo(out), nil
+			cur, err := volumePercent()
+			if err != nil {
+				return "", err
+			}
+			return setVolume(clamp(cur+d, 0, 100))
 		},
 	})
 
 	Register(Tool{
 		Name:        "brightness_set",
-		Description: "Установить яркость экрана (подсветки): percent — значение 5–100 («яркость 60», «на максимум»); delta — сдвиг от текущей яркости («ярче» +20, «темнее» −20). Не громкость звука.",
-		Params: map[string]any{
-			"percent": num("яркость, 5–100"),
-			"delta":   num("сдвиг в процентных пунктах: плюс — ярче, минус — темнее"),
-		},
-		Dangerous: true,
+		Description: "Установить яркость экрана (подсветки) в процентах (5–100): «яркость 60», «на максимум». Не громкость звука.",
+		Params:      map[string]any{"percent": num("яркость, 5–100")},
+		Required:    []string{"percent"},
+		Dangerous:   true,
 		Run: func(args map[string]any) (string, error) {
-			max, err := readFirst("class/backlight/*/max_brightness")
+			p, err := intArg(args, "percent", 5, 100)
 			if err != nil {
 				return "", err
 			}
-			m, err := strconv.Atoi(max)
-			if err != nil || m <= 0 {
-				return "", fmt.Errorf("max_brightness: %q", max)
-			}
-			current := func() (int, error) {
-				cur, err := readFirst("class/backlight/*/brightness")
-				if err != nil {
-					return 0, err
-				}
-				c, err := strconv.Atoi(cur)
-				if err != nil {
-					return 0, fmt.Errorf("brightness: %q", cur)
-				}
-				return (c*100 + m/2) / m, nil
-			}
-			p, err := levelArg(args, 5, 100, current)
-			if err != nil {
-				return "", err
-			}
-			files, _ := filepath.Glob(filepath.Join(sysfs, "class/backlight/*/brightness"))
-			if len(files) == 0 {
-				return "", fmt.Errorf("нет подсветки экрана")
-			}
-			if err := os.WriteFile(files[0], []byte(strconv.Itoa(m*p/100)), 0o644); err != nil {
-				return "", err
-			}
-			return fmt.Sprintf("яркость %d%%", p), nil
+			return setBrightness(p)
 		},
 	})
+
+	Register(Tool{
+		Name:        "brightness_step",
+		Description: "Сделать экран ярче или темнее на шаг, когда число не названо: «ярче», «потемнее». Не громкость звука.",
+		Params:      map[string]any{"direction": str("up — ярче, down — темнее")},
+		Required:    []string{"direction"},
+		Dangerous:   true,
+		Run: func(args map[string]any) (string, error) {
+			d, err := stepArg(args, 20)
+			if err != nil {
+				return "", err
+			}
+			cur, err := brightnessPercent()
+			if err != nil {
+				return "", err
+			}
+			return setBrightness(clamp(cur+d, 5, 100))
+		},
+	})
+}
+
+func setVolume(p int) (string, error) {
+	if _, err := execCmd("wpctl", "set-volume", sink, strconv.Itoa(p)+"%"); err != nil {
+		return "", err
+	}
+	out, err := execCmd("wpctl", "get-volume", sink)
+	if err != nil {
+		return "", err
+	}
+	return volumeInfo(out), nil
+}
+
+func brightnessMax() (int, error) {
+	max, err := readFirst("class/backlight/*/max_brightness")
+	if err != nil {
+		return 0, err
+	}
+	m, err := strconv.Atoi(max)
+	if err != nil || m <= 0 {
+		return 0, fmt.Errorf("max_brightness: %q", max)
+	}
+	return m, nil
+}
+
+func brightnessPercent() (int, error) {
+	m, err := brightnessMax()
+	if err != nil {
+		return 0, err
+	}
+	cur, err := readFirst("class/backlight/*/brightness")
+	if err != nil {
+		return 0, err
+	}
+	c, err := strconv.Atoi(cur)
+	if err != nil {
+		return 0, fmt.Errorf("brightness: %q", cur)
+	}
+	return (c*100 + m/2) / m, nil
+}
+
+func setBrightness(p int) (string, error) {
+	m, err := brightnessMax()
+	if err != nil {
+		return "", err
+	}
+	files, _ := filepath.Glob(filepath.Join(sysfs, "class/backlight/*/brightness"))
+	if len(files) == 0 {
+		return "", fmt.Errorf("нет подсветки экрана")
+	}
+	if err := os.WriteFile(files[0], []byte(strconv.Itoa(m*p/100)), 0o644); err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("яркость %d%%", p), nil
 }

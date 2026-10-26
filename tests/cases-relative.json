@@ -2,65 +2,65 @@
  {
   "id": 137,
   "q": "сделай ярче",
-  "tool": "brightness_set",
+  "tool": "brightness_step",
   "args": {
-   "delta": "+"
+   "direction": "up"
   }
  },
  {
   "id": 138,
   "q": "потемнее",
-  "tool": "brightness_set",
+  "tool": "brightness_step",
   "args": {
-   "delta": "-"
+   "direction": "down"
   }
  },
  {
   "id": 139,
   "q": "поярче пожалуйста, ничего не видно",
-  "tool": "brightness_set",
+  "tool": "brightness_step",
   "args": {
-   "delta": "+"
+   "direction": "up"
   }
  },
  {
   "id": 140,
   "q": "чуть-чуть убавь яркость",
-  "tool": "brightness_set",
+  "tool": "brightness_step",
   "args": {
-   "delta": "-"
+   "direction": "down"
   }
  },
  {
   "id": 141,
   "q": "сделай погромче",
-  "tool": "volume_set",
+  "tool": "volume_step",
   "args": {
-   "delta": "+"
+   "direction": "up"
   }
  },
  {
   "id": 142,
   "q": "потише",
-  "tool": "volume_set",
+  "tool": "volume_step",
   "args": {
-   "delta": "-"
+   "direction": "down"
   }
  },
  {
   "id": 143,
   "q": "прибавь звук",
-  "tool": "volume_set",
+  "tool": "volume_step",
   "args": {
-   "delta": "+"
+   "direction": "up"
   }
  },
  {
   "id": 144,
   "q": "слишком громко",
-  "tool": "volume_set",
+  "tool": "volume_step",
   "args": {
-   "delta": "-"
+   "direction": "down"
   }
  },
  {
