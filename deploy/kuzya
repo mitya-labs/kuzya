@@ -1,0 +1,9 @@
+#!/bin/sh
+# Команда `kuzya` для терминала: поднимает сервер (с кэшем промпта), запускает Кузю, останавливает сервер.
+# Ставится в ~/.local/bin/kuzya; программа и сервер лежат в ~/kuzya.
+KH="${KUZYA_HOME:-$HOME/kuzya}"
+"$KH/kuzya-server" start || exit 1
+"$KH/bin/kuzya" "$@"
+rc=$?
+"$KH/kuzya-server" stop
+exit $rc
