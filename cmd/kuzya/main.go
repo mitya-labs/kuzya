@@ -13,9 +13,9 @@ import (
 func main() {
 	in := bufio.NewReader(os.Stdin)
 	confirm := func(name string) bool {
-		fmt.Printf("Кузя хочет выполнить «%s». Разрешить? [y/N] ", name)
+		fmt.Printf("Кузя хочет выполнить «%s». Разрешить? [y/N, д/н] ", name)
 		s, _ := in.ReadString('\n')
-		return strings.EqualFold(strings.TrimSpace(s), "y")
+		return isYes(s)
 	}
 	a := agent.New(llm.New(), confirm)
 
@@ -50,6 +50,15 @@ func main() {
 			return
 		}
 	}
+}
+
+// isYes — согласие на опасное действие: y, yes, д, да (любой регистр); всё остальное, включая пустой ввод, — отказ.
+func isYes(s string) bool {
+	switch strings.ToLower(strings.TrimSpace(s)) {
+	case "y", "yes", "д", "да":
+		return true
+	}
+	return false
 }
 
 func answer(a *agent.Agent, prompt string) {
