@@ -11,4 +11,4 @@ Two colours on a dark tile: turquoise `#5EEADB` (light theme `#14968F`) and the 
 | `kuzya-minimal.svg`, `kuzya-minimal-light.svg`, `kuzya-minimal.png` | rejected, too primitive | Claude-style minimalism: two triangles and two dots, no face details |
 
 Русский: основной — `mid-glasses` (с очками), альтернативный — `mid` (без очков); `simple` и `minimal` отклонены, подробный `kuzya` оставлен как ранняя версия.
-| `kuzya-terminal.png` | preview of the terminal logo | 34×38 pixel version of `mid-glasses` for the interactive mode (`cmd/kuzya/logo.go`, half-block characters, 24-bit colour or 256 colours); not shown when output is not a terminal, with `NO_COLOR` or `KUZYA_NOLOGO` |
+| `kuzya-terminal.png` | preview of the terminal logo | 34×38 pixel version of `mid-glasses` without the glasses (eyes with highlights) for the interactive mode (`cmd/kuzya/logo.go`, half-block characters, 24-bit colour or 256 colours); not shown when output is not a terminal, with `NO_COLOR` or `KUZYA_NOLOGO` |
