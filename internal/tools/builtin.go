@@ -165,12 +165,14 @@ func init() {
 
 	Register(Tool{
 		Name:        "volume_set",
-		Description: "Установить громкость звука в процентах (0–100): «громкость 40», «громкость на максимум». Если просят «потише» или «погромче» без числа, сначала вызови volume_get и выбери значение на 10–20 пунктов меньше или больше. Не яркость экрана.",
-		Params:      map[string]any{"percent": num("громкость, 0–100")},
-		Required:    []string{"percent"},
-		Dangerous:   true,
+		Description: "Установить громкость звука: percent — значение 0–100 («громкость 40», «на половину», «на максимум»); delta — сдвиг от текущей громкости («погромче» +10, «потише» −10). Не яркость экрана.",
+		Params: map[string]any{
+			"percent": num("громкость, 0–100"),
+			"delta":   num("сдвиг в процентных пунктах: плюс — громче, минус — тише"),
+		},
+		Dangerous: true,
 		Run: func(args map[string]any) (string, error) {
-			p, err := intArg(args, "percent", 0, 100)
+			p, err := levelArg(args, 0, 100, volumePercent)
 			if err != nil {
 				return "", err
 			}
@@ -186,44 +188,36 @@ func init() {
 	})
 
 	Register(Tool{
-		Name:        "brightness_get",
-		Description: "Текущая яркость экрана в процентах. Нужна, когда просят «ярче» или «темнее» без числа.",
-		Run: func(map[string]any) (string, error) {
-			cur, err := readFirst("class/backlight/*/brightness")
-			if err != nil {
-				return "", err
-			}
-			max, err := readFirst("class/backlight/*/max_brightness")
-			if err != nil {
-				return "", err
-			}
-			c, err1 := strconv.Atoi(cur)
-			m, err2 := strconv.Atoi(max)
-			if err1 != nil || err2 != nil || m <= 0 {
-				return "", fmt.Errorf("не прочитал яркость: %q из %q", cur, max)
-			}
-			return fmt.Sprintf("яркость %d%%", (c*100+m/2)/m), nil
-		},
-	})
-
-	Register(Tool{
 		Name:        "brightness_set",
-		Description: "Установить яркость экрана (подсветки) в процентах (5–100): «яркость 60», «яркость на максимум». Если просят «ярче» или «темнее» без числа, сначала вызови brightness_get и выбери значение на 20 пунктов больше или меньше. Не громкость звука.",
-		Params:      map[string]any{"percent": num("яркость, 5–100")},
-		Required:    []string{"percent"},
-		Dangerous:   true,
+		Description: "Установить яркость экрана (подсветки): percent — значение 5–100 («яркость 60», «на максимум»); delta — сдвиг от текущей яркости («ярче» +20, «темнее» −20). Не громкость звука.",
+		Params: map[string]any{
+			"percent": num("яркость, 5–100"),
+			"delta":   num("сдвиг в процентных пунктах: плюс — ярче, минус — темнее"),
+		},
+		Dangerous: true,
 		Run: func(args map[string]any) (string, error) {
-			p, err := intArg(args, "percent", 5, 100)
-			if err != nil {
-				return "", err
-			}
 			max, err := readFirst("class/backlight/*/max_brightness")
 			if err != nil {
 				return "", err
 			}
 			m, err := strconv.Atoi(max)
+			if err != nil || m <= 0 {
+				return "", fmt.Errorf("max_brightness: %q", max)
+			}
+			current := func() (int, error) {
+				cur, err := readFirst("class/backlight/*/brightness")
+				if err != nil {
+					return 0, err
+				}
+				c, err := strconv.Atoi(cur)
+				if err != nil {
+					return 0, fmt.Errorf("brightness: %q", cur)
+				}
+				return (c*100 + m/2) / m, nil
+			}
+			p, err := levelArg(args, 5, 100, current)
 			if err != nil {
-				return "", fmt.Errorf("max_brightness: %w", err)
+				return "", err
 			}
 			files, _ := filepath.Glob(filepath.Join(sysfs, "class/backlight/*/brightness"))
 			if len(files) == 0 {

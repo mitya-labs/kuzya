@@ -65,6 +65,17 @@ Source: a note from a third party; its dotprod claim is wrong for this phone (no
 - Сравнить модели из короткого списка на одном наборе; победителя оставить.
 - Если < ~80% — улучшать промпт/описания; затем LoRA на нескольких сотнях примеров.
 
+## Stage 4b — LoRA fine-tuning (decided 2026-10-26)
+Why: prompt-only tool selection is brittle on small models. Adding one tool (`brightness_get`) or changing a description made unrelated `wifi_status` phrasings fail (ids 7, 45, 46; 86/90 → 82/90 on the same queries, repeatable), and every description tweak has to be re-verified on the whole set. A model fine-tuned on our 11 tools should be stable, allow much shorter tool descriptions (the prompt is about 1300 tokens now, the cold first request costs 100–265 s and about 2% of the battery) and may let a smaller, cheaper model (Qwen3.5-0.8B scored 76% without tuning, half the RAM of Gemma) reach the accuracy of Gemma 4 E2B (91–96% on our sets).
+- Hardware for training: Apple M2 Pro, 16 GB, 84 GB free, Python `mlx` present, `mlx_lm` to be installed. Conversion back needs the scripts from the `llama.cpp` repository (merge the adapter, `convert_hf_to_gguf.py`, `llama-quantize` to Q4_K_M); our Docker build only has the binaries.
+- [ ] Baseline without tuning is recorded (Gemma 4 E2B, Qwen3.5-2B, Qwen3.5-0.8B on `tests/cases-all.json`), after the `delta` experiment for relative brightness/volume requests.
+- [ ] Set `temperature` to 0 for tool calling (now 0.2) and re-run the baseline: part of the run-to-run jumps may be sampling noise; makes all comparisons fairer.
+- [ ] Training data generator: templates plus paraphrases in Russian (slang, typos, English mixed in, indirect and compound phrasing, numbers in words, relative requests "ярче/потише" with `delta`, negatives that are close to real tools), several hundred to a few thousand examples; separate `train`, `dev` and `test` files. **The training phrasings must not overlap with `tests/cases*.json`** (otherwise the rate proves nothing); keep a small hand-written held-out set like `tests/cases-held.json`. Negatives must be a large share, otherwise the model forgets to refuse in text.
+- [ ] Check that `mlx_lm` can fine-tune the candidate architectures (Qwen3.5 and Gemma 4 are new, Qwen3-1.7B is the safe fallback); trial run on the smallest suitable model to verify the whole chain: LoRA → merged weights → GGUF Q4_K_M → `llama-server --jinja` on the phone → `tests/`.
+- [ ] Shorten tool descriptions after tuning and re-measure the prompt size, the cold first request and the correct-call rate.
+- [ ] Pick the model for the full training by the measured rate, speed, peak RAM and battery cost per query (about 0.1% per query for Gemma 4 E2B now); update `SUMMARY.md`.
+- Decision rule: tuned model wins only if it beats the prompt-only baseline on the held-out set and on negatives, not just on the training-like phrasings.
+
 ## Этап 5 — интеграция
 - Автозапуск `llama-server` по требованию (не держать в ОЗУ постоянно).
 - Сквозная проверка через агента на телефоне сделана (2026-10-26, Gemma 4 E2B): подтверждение, отказ («Отменено: …»), пустой ответ модели после инструмента заменяется результатом инструмента; `service_restart NetworkManager` проверен (работает, ~5 с, связь Wi-Fi и USB возвращается); `wifi_connect` из SSH не работает (polkit: «Not authorized to control networking»), но из локальной сессии SXMO (через `swaymsg exec`) работает: подключение за 9 с, поэтому Кузя запускается из пункта меню SXMO (`deploy/sxmo/kuzya`), правило polkit не нужно.

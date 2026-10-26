@@ -1,0 +1,192 @@
+[
+ {
+  "id": 5,
+  "q": "я подключён к вайфаю?",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 6,
+  "q": "какие wi-fi сети у меня сохранены?",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 7,
+  "q": "что с интернетом, к чему подключён телефон?",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 45,
+  "q": "есть интернет по вайфаю или опять отвалился",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 46,
+  "q": "к какой сети я сейчас присосался",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 47,
+  "q": "покажи вафлю",
+  "tool": "wifi_status",
+  "args": {}
+ },
+ {
+  "id": 64,
+  "q": "громкость сколько стоит",
+  "tool": "volume_get",
+  "args": {}
+ },
+ {
+  "id": 65,
+  "q": "звук громко или тихо сейчас",
+  "tool": "volume_get",
+  "args": {}
+ },
+ {
+  "id": 66,
+  "q": "сделай потише, процентов 15",
+  "tool": "volume_set",
+  "args": {
+   "percent": 15
+  }
+ },
+ {
+  "id": 67,
+  "q": "громкость на половину",
+  "tool": "volume_set",
+  "args": {
+   "percent": 50
+  }
+ },
+ {
+  "id": 72,
+  "q": "экран слишком яркий, убавь до 20",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 20
+  }
+ },
+ {
+  "id": 73,
+  "q": "поставь яркость максимум",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 100
+  }
+ },
+ {
+  "id": 74,
+  "q": "подсветку на 40 процентов, глаза режет",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 40
+  }
+ },
+ {
+  "id": 75,
+  "q": "напиши мне стих про осень",
+  "tool": null,
+  "args": {}
+ },
+ {
+  "id": 137,
+  "q": "сделай ярче",
+  "tool": "brightness_set",
+  "args": {
+   "delta": "+"
+  }
+ },
+ {
+  "id": 138,
+  "q": "потемнее",
+  "tool": "brightness_set",
+  "args": {
+   "delta": "-"
+  }
+ },
+ {
+  "id": 139,
+  "q": "поярче пожалуйста, ничего не видно",
+  "tool": "brightness_set",
+  "args": {
+   "delta": "+"
+  }
+ },
+ {
+  "id": 140,
+  "q": "чуть-чуть убавь яркость",
+  "tool": "brightness_set",
+  "args": {
+   "delta": "-"
+  }
+ },
+ {
+  "id": 141,
+  "q": "сделай погромче",
+  "tool": "volume_set",
+  "args": {
+   "delta": "+"
+  }
+ },
+ {
+  "id": 142,
+  "q": "потише",
+  "tool": "volume_set",
+  "args": {
+   "delta": "-"
+  }
+ },
+ {
+  "id": 143,
+  "q": "прибавь звук",
+  "tool": "volume_set",
+  "args": {
+   "delta": "+"
+  }
+ },
+ {
+  "id": 144,
+  "q": "слишком громко",
+  "tool": "volume_set",
+  "args": {
+   "delta": "-"
+  }
+ },
+ {
+  "id": 145,
+  "q": "яркость 60",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 60
+  }
+ },
+ {
+  "id": 146,
+  "q": "громкость 70",
+  "tool": "volume_set",
+  "args": {
+   "percent": 70
+  }
+ },
+ {
+  "id": 147,
+  "q": "поставь яркость на максимум",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 100
+  }
+ },
+ {
+  "id": 148,
+  "q": "сделай яркость 25 процентов",
+  "tool": "brightness_set",
+  "args": {
+   "percent": 25
+  }
+ }
+]

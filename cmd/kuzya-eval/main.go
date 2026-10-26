@@ -129,7 +129,18 @@ func norm(v any) string {
 func argsMatch(want, got map[string]any) bool {
 	for k, v := range want {
 		g, ok := got[k]
-		if !ok || norm(g) != norm(v) {
+		if !ok {
+			return false
+		}
+		// "+" и "-" в ожидаемом значении означают только знак числа (для delta)
+		if w, isStr := v.(string); isStr && (w == "+" || w == "-") {
+			f, err := strconv.ParseFloat(norm(g), 64)
+			if err != nil || (w == "+" && f <= 0) || (w == "-" && f >= 0) {
+				return false
+			}
+			continue
+		}
+		if norm(g) != norm(v) {
 			return false
 		}
 	}

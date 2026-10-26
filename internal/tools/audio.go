@@ -25,6 +25,23 @@ func volumeInfo(out string) string {
 	return s
 }
 
+// volumePercent читает текущую громкость в процентах из вывода wpctl get-volume.
+func volumePercent() (int, error) {
+	out, err := execCmd("wpctl", "get-volume", sink)
+	if err != nil {
+		return 0, err
+	}
+	f := strings.Fields(out)
+	if len(f) < 2 {
+		return 0, fmt.Errorf("не прочитал громкость: %q", out)
+	}
+	v, err := strconv.ParseFloat(f[1], 64)
+	if err != nil {
+		return 0, fmt.Errorf("не прочитал громкость: %q", out)
+	}
+	return int(v*100 + 0.5), nil
+}
+
 func init() {
 	Register(Tool{
 		Name:        "volume_get",

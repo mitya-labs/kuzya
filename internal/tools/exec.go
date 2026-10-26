@@ -81,3 +81,34 @@ func unitName(s string) (string, error) {
 	}
 	return s, nil
 }
+
+// levelArg возвращает целевой уровень (проценты): percent как есть либо текущий уровень + delta,
+// обрезанный до [lo, hi]. Нужен для «ярче/потише» без числа: текущее значение инструмент читает сам.
+func levelArg(args map[string]any, lo, hi int, current func() (int, error)) (int, error) {
+	_, hasP := args["percent"]
+	_, hasD := args["delta"]
+	switch {
+	case hasP && hasD:
+		return 0, fmt.Errorf("укажи либо percent, либо delta")
+	case hasP:
+		return intArg(args, "percent", lo, hi)
+	case hasD:
+		d, err := intArg(args, "delta", -100, 100)
+		if err != nil {
+			return 0, err
+		}
+		cur, err := current()
+		if err != nil {
+			return 0, err
+		}
+		p := cur + d
+		if p < lo {
+			p = lo
+		}
+		if p > hi {
+			p = hi
+		}
+		return p, nil
+	}
+	return 0, fmt.Errorf("нужен percent или delta")
+}

@@ -117,6 +117,13 @@ func TestVolumeAndMute(t *testing.T) {
 	if got := strings.Join((*calls)[0].args, " "); got != "set-volume @DEFAULT_AUDIO_SINK@ 40%" {
 		t.Errorf("args=%q", got)
 	}
+	*calls = nil
+	if _, err := run(t, "volume_set", map[string]any{"delta": -10.0}); err != nil {
+		t.Fatal(err)
+	}
+	if got := strings.Join((*calls)[1].args, " "); got != "set-volume @DEFAULT_AUDIO_SINK@ 30%" {
+		t.Errorf("delta -10 от 40%%: args=%q", got)
+	}
 	if _, err := run(t, "volume_set", map[string]any{"percent": 150.0}); err == nil {
 		t.Error("150% должно отклоняться")
 	}
@@ -158,8 +165,18 @@ func TestSysfsTools(t *testing.T) {
 	if string(b) != "2047" {
 		t.Errorf("brightness=%q, ждали 2047", b)
 	}
-	if out, err := run(t, "brightness_get", nil); err != nil || out != "яркость 50%" {
-		t.Errorf("brightness_get: out=%q err=%v", out, err)
+	// delta: от текущих 50% (2047/4095) на +20 → 70%; на -100 не ниже 5%
+	if out, err := run(t, "brightness_set", map[string]any{"delta": 20.0}); err != nil || out != "яркость 70%" {
+		t.Errorf("delta +20: out=%q err=%v", out, err)
+	}
+	if out, err := run(t, "brightness_set", map[string]any{"delta": -100.0}); err != nil || out != "яркость 5%" {
+		t.Errorf("delta -100: out=%q err=%v", out, err)
+	}
+	if _, err := run(t, "brightness_set", map[string]any{"percent": 50.0, "delta": 5.0}); err == nil {
+		t.Error("percent вместе с delta должно отклоняться")
+	}
+	if _, err := run(t, "brightness_set", nil); err == nil {
+		t.Error("без percent и delta должно отклоняться")
 	}
 	if _, err := run(t, "brightness_set", map[string]any{"percent": 0.0}); err == nil {
 		t.Error("яркость 0% должна отклоняться (чёрный экран)")
