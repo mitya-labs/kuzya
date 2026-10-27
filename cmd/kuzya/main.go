@@ -58,10 +58,15 @@ func main() {
 	printLogo(os.Stdout, os.Stdout)
 	fmt.Println(rule())
 	fmt.Println(" " + bold("Кузя") + dim(" · офлайн-агент skladenOS"))
-	fmt.Println(" " + dim("модель ") + cyan(modelLabel()) + dim("   ·   ? разговор") + dim("   ·   ! удалённая") + dim("   ·   /help"))
+	fmt.Println(" " + dim("модель ") + cyan(modelLabel()) + dim("   ·   ? разговор") + dim("   ·   ! удалённая") + dim("   ·   /remote") + dim("   ·   /help"))
 	fmt.Println(rule())
+	remoteOnly := false
 	for {
-		line, err := l.Prompt("› ")
+		prompt := "› "
+		if remoteOnly {
+			prompt = "r› "
+		}
+		line, err := l.Prompt(prompt)
 		if err == liner.ErrPromptAborted {
 			fmt.Println()
 			continue
@@ -80,10 +85,38 @@ func main() {
 		case "/reset", "/сброс":
 			a.Reset()
 			fmt.Println(dim("Забыл."))
+		case "/remote", "/remote on", "/remote off", "/удалённо", "/удаленно":
+			want := !remoteOnly
+			if strings.HasSuffix(line, " on") || line == "/удалённо" || line == "/удаленно" {
+				want = true
+			}
+			if strings.HasSuffix(line, " off") {
+				want = false
+			}
+			if want == remoteOnly {
+				break
+			}
+			if want {
+				if !remoteConfigured() {
+					fmt.Println(dim("Удалённая модель не настроена: KUZYA_REMOTE_URL/KEY/MODEL."))
+					break
+				}
+				stopServer()
+				fmt.Println(dim("режим: только удалённая модель; локальный сервер остановлен"))
+				remoteOnly = true
+			} else {
+				if err := startServer(); err != nil {
+					fmt.Fprintln(os.Stderr, red("сервер не поднялся: "+err.Error()))
+					break
+				}
+				fmt.Println(dim("режим: локальная и удалённая; сервер запущен"))
+				remoteOnly = false
+			}
 		case "/help", "/?", "/помощь":
 			fmt.Println(rule())
 			fmt.Println(" " + cyan("?") + " текст — разговор (удалённая модель, если настроена)")
 			fmt.Println(" " + cyan("!") + " или " + cyan("@") + " текст — удалённая модель с локальными инструментами")
+			fmt.Println(" " + cyan("/remote") + " — только удалённая модель (локальный сервер останавливается)")
 			fmt.Println(" " + cyan("/reset") + " — забыть разговор")
 			fmt.Println(" " + cyan("/exit") + " — выйти")
 			fmt.Println(rule())
@@ -91,6 +124,9 @@ func main() {
 			if strings.HasPrefix(line, "/") {
 				fmt.Println(dim("Нет такой команды. /help — список."))
 				break
+			}
+			if remoteOnly && !strings.HasPrefix(line, "?") && !strings.HasPrefix(line, "!") && !strings.HasPrefix(line, "@") {
+				line = "!" + line
 			}
 			a = answer(a, confirm, line)
 		}
@@ -139,6 +175,28 @@ func answer(a *agent.Agent, confirm func(string) bool, prompt string) *agent.Age
 	fmt.Println()
 	fmt.Println(green("●") + " " + out)
 	return a
+}
+
+func remoteConfigured() bool {
+	return os.Getenv("KUZYA_REMOTE_URL") != "" && os.Getenv("KUZYA_REMOTE_KEY") != "" && os.Getenv("KUZYA_REMOTE_MODEL") != ""
+}
+
+func kuzyaHomeDir() string {
+	if h := os.Getenv("KUZYA_HOME"); h != "" {
+		return h
+	}
+	home, _ := os.UserHomeDir()
+	return filepath.Join(home, "kuzya")
+}
+
+func stopServer() {
+	_ = exec.Command(filepath.Join(kuzyaHomeDir(), "kuzya-server"), "stop").Run()
+}
+
+func startServer() error {
+	cmd := exec.Command(filepath.Join(kuzyaHomeDir(), "kuzya-server"), "start")
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
 
 // clean убирает markdown-разметку из ответов удалённой модели.
