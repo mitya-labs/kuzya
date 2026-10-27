@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"kuzya/internal/llm"
+	"kuzya/internal/rules"
 	"kuzya/internal/tools"
 )
 
@@ -37,6 +38,23 @@ func (a *Agent) Reset() {
 
 // Run добавляет реплику пользователя и крутит цикл до ответа без вызовов.
 func (a *Agent) Run(prompt string) (string, error) {
+	// Жёсткие негативы и очевидные команды решаем без модели: это и точнее, и дешевле.
+	if msg, ok := rules.Refusal(prompt); ok {
+		a.History = append(a.History, llm.Message{Role: "user", Content: prompt}, llm.Message{Role: "assistant", Content: msg})
+		a.trim()
+		return msg, nil
+	}
+	if tool, args, ok := rules.Preroute(prompt); ok {
+		raw, _ := json.Marshal(args)
+		out, confirmed := a.call(llm.FunctionCall{Name: tool, Arguments: string(raw)})
+		if !confirmed {
+			out = fmt.Sprintf("Отменено: «%s» не выполнен.", tool)
+		}
+		a.History = append(a.History, llm.Message{Role: "user", Content: prompt}, llm.Message{Role: "assistant", Content: out})
+		a.trim()
+		return out, nil
+	}
+
 	a.History = append(a.History, llm.Message{Role: "user", Content: prompt})
 	a.trim()
 	last := "" // результат последнего выполненного инструмента
@@ -56,6 +74,17 @@ func (a *Agent) Run(prompt string) (string, error) {
 		}
 		denied := ""
 		for _, c := range reply.ToolCalls {
+			if c.Function.Name != "" {
+				var args map[string]any
+				if c.Function.Arguments != "" {
+					_ = json.Unmarshal([]byte(c.Function.Arguments), &args)
+				}
+				name, fixed := rules.Repair(prompt, c.Function.Name, args)
+				if name != c.Function.Name || fixed != nil {
+					raw, _ := json.Marshal(fixed)
+					c.Function.Name, c.Function.Arguments = name, string(raw)
+				}
+			}
 			out, ok := a.call(c.Function)
 			if ok {
 				last = out

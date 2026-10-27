@@ -14,6 +14,7 @@ import (
 
 	"kuzya/internal/agent"
 	"kuzya/internal/llm"
+	"kuzya/internal/rules"
 	"kuzya/internal/tools"
 )
 
@@ -33,6 +34,7 @@ type Result struct {
 	Reply   string         `json:"reply,omitempty"`
 	Err     string         `json:"err,omitempty"`
 	Seconds float64        `json:"seconds"`
+	Source  string         `json:"source,omitempty"` // model или rules
 }
 
 func main() {
@@ -40,6 +42,7 @@ func main() {
 	out := flag.String("out", "", "куда писать подробный результат (jsonl)")
 	systemFile := flag.String("system", "", "файл с системным промптом (по умолчанию agent.System)")
 	full := flag.Bool("full", false, "полный промпт и подробные описания инструментов (для базовых моделей)")
+	useRules := flag.Bool("rules", false, "детерминированные правила до и после модели")
 	flag.Parse()
 
 	system := agent.System
@@ -73,6 +76,38 @@ func main() {
 	for _, c := range cases {
 		r := Result{Case: c}
 		start := time.Now()
+		r.Source = "model"
+		if *useRules {
+			if msg, ok := rules.Refusal(c.Q); ok {
+				r.Source = "rules"
+				r.Reply = msg
+				r.ToolOK = c.Tool == ""
+				r.ArgsOK = r.ToolOK
+				r.Seconds = time.Since(start).Seconds()
+				results = append(results, r)
+				mark := "ok  "
+				if !r.ArgsOK {
+					mark = "FAIL"
+				}
+				fmt.Printf("%s %2d %-48q ждали %-16s получили %-16s %v %.0fс\n", mark, c.ID, c.Q, orNone(c.Tool), orNone(r.GotTool), r.GotArgs, r.Seconds)
+				continue
+			}
+			if tool, args, ok := rules.Preroute(c.Q); ok {
+				r.Source = "rules"
+				r.GotTool = tool
+				r.GotArgs = args
+				r.ToolOK = r.GotTool == c.Tool
+				r.ArgsOK = r.ToolOK && argsMatch(c.Args, r.GotArgs)
+				r.Seconds = time.Since(start).Seconds()
+				results = append(results, r)
+				mark := "ok  "
+				if !r.ArgsOK {
+					mark = "FAIL"
+				}
+				fmt.Printf("%s %2d %-48q ждали %-16s получили %-16s %v %.0fс\n", mark, c.ID, c.Q, orNone(c.Tool), orNone(r.GotTool), r.GotArgs, r.Seconds)
+				continue
+			}
+		}
 		msgs := []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: c.Q}}
 		reply, err := client.Chat(msgs, schemas())
 		r.Seconds = time.Since(start).Seconds()
@@ -84,6 +119,12 @@ func main() {
 				f := reply.ToolCalls[0].Function
 				r.GotTool = f.Name
 				_ = json.Unmarshal([]byte(f.Arguments), &r.GotArgs)
+				if *useRules && r.GotArgs == nil {
+					r.GotArgs = map[string]any{}
+				}
+				if *useRules {
+					r.GotTool, r.GotArgs = rules.Repair(c.Q, r.GotTool, r.GotArgs)
+				}
 			}
 			r.ToolOK = r.GotTool == c.Tool
 			r.ArgsOK = r.ToolOK && argsMatch(c.Args, r.GotArgs)
