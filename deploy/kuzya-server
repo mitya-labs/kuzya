@@ -9,18 +9,29 @@ MODEL="${KUZYA_MODEL:-nafanya-1.7b-Q4_K_M}"
 URL="http://127.0.0.1:8080"
 SLOT="$MODEL.bin"
 PIDFILE="$KH/server.pid"
+MODELFILE="$KH/server.model"
 
 up() { curl -sf "$URL/health" >/dev/null 2>&1; }
 
 case "${1:-start}" in
 	start)
-		up && exit 0
+		if up; then
+			cur=$(cat "$MODELFILE" 2>/dev/null || echo "")
+			[ "$cur" = "$MODEL" ] && exit 0
+			# Сменили KUZYA_MODEL: старый сервер останавливаем, чтобы не держать две модели.
+			"$0" stop
+			n=0; while up; do
+				n=$((n+1)); [ "$n" -gt 20 ] && { echo "старый сервер не остановился" >&2; exit 1; }
+				sleep 1
+			done
+		fi
 		mkdir -p "$KH/slots"
 		setsid nohup "$KH/bin/llama-server" -m "$KH/models/$MODEL.gguf" --jinja \
 			--chat-template-kwargs '{"enable_thinking":false}' -t 4 -c 4096 \
 			--host 127.0.0.1 --port 8080 --slot-save-path "$KH/slots" \
 			> "$KH/server.log" 2>&1 < /dev/null &
 		echo $! > "$PIDFILE"
+		echo "$MODEL" > "$MODELFILE"
 		n=0; until up; do
 			n=$((n+1)); [ "$n" -gt 120 ] && { echo "сервер не поднялся, см. $KH/server.log" >&2; exit 1; }
 			sleep 1
@@ -38,7 +49,7 @@ case "${1:-start}" in
 		;;
 	stop)
 		[ -f "$PIDFILE" ] && kill "$(cat "$PIDFILE")" 2>/dev/null
-		rm -f "$PIDFILE"
+		rm -f "$PIDFILE" "$MODELFILE"
 		;;
 	status)
 		if up; then echo "работает"; else echo "остановлен"; exit 1; fi

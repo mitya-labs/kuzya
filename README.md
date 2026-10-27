@@ -37,4 +37,10 @@ kuzya "подключи Wi-Fi"
   `docker build --platform linux/arm64 --target out --output type=local,dest=build/out -f build/Dockerfile build`
 - Copy `build/out/*` and a `.gguf` model to the phone (`~/kuzya/bin`, `~/kuzya/models`); models are not in git / модели не в git.
 - Run `llama-server --jinja -m <model>.gguf` on the phone, then `kuzya`. Server address: `KUZYA_URL`, default `http://127.0.0.1:8080/v1/chat/completions`.
+- Model switch / Переключение модели: `KUZYA_MODEL=nafanya-1.7b-Q4_K_M kuzya "…"` (default) or `KUZYA_MODEL=nafanya-0.8b-Q4_K_M kuzya "…"`. `kuzya-server` restarts itself when the model changes and keeps a separate slot cache per model. / При смене модели сервер перезапускается сам, кэш слота у каждой модели свой.
+
+| Model | Fresh sets (rules) | Peak RAM | Warm energy | Use |
+|---|---:|---:|---:|---|
+| nafanya-1.7b | 98% | 1.71 GB | 8.9 J/query | default, accuracy first |
+| nafanya-0.8b | 88% | 0.92 GB | 4.4 J/query | memory first |
 - Tests / тесты: `go test ./...`

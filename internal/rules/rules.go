@@ -28,35 +28,38 @@ const (
 )
 
 var (
-	reSSH        = regexp.MustCompile(`(^|[^a-z])sshd?([^a-z]|$)`)
-	reWifiVerb   = regexp.MustCompile(`(включ|вруб|выключ|отключ|отруб|погаси|активир)[а-я]*\s+(вайфай|wifi|вафл|беспроводн)`)
-	reAllUnits   = regexp.MustCompile(verbAlt + `[а-я]*.*(все|всех|кажд)[а-я]*\s+` + unitAlt + `|` + verbAlt + `[а-я]*.*все`)
-	reStopUnit   = regexp.MustCompile(`(останов|выключ|приостанов|погаси)[а-я]*\s+` + unitAlt)
-	reArith      = regexp.MustCompile(`(скольк|посчита|вычисли|умнож|раздели|сложи)[а-я]*.*\d+\s*(\*|x|х|умнож|плюс|минус|раздел|дел|слож)|(умнож|раздел|сложи|посчита)[а-я]*.*\d+.*\d+`)
-	reAllLogs    = regexp.MustCompile(`(все|всех|кажд)[а-я]*\s+(служб|сервис|демон)`)
-	reNetName    = regexp.MustCompile(`[A-Za-z][A-Za-z0-9._-]*[0-9][A-Za-z0-9._-]*|[A-Za-z][A-Za-z0-9._-]*-[A-Za-z0-9._-]+`)
-	reBattery    = regexp.MustCompile(`(заряд|батаре|аккумулятор)`)
-	reServices   = regexp.MustCompile(`(какие|список|что|перечисли)[а-я]*.*(служб|сервис|демон)`)
-	reWifi       = regexp.MustCompile(`(вафл|вайфа|wifi|беспроводн)`)
-	reLogs       = regexp.MustCompile(`(лог|журнал|строк|строч)`)
-	reRestart    = regexp.MustCompile(verbAlt)
-	reVolume     = regexp.MustCompile(`(громк|громч|звук|тише|потише)`)
-	reAskLevel   = regexp.MustCompile(`(скольк|какая|какой|уровень|чему|покажи|стоит|выставлен)`)
-	reDigit      = regexp.MustCompile(`\d{1,3}`)
-	reCountWords = regexp.MustCompile(`строк|строч|штук`)
-	rePercent    = regexp.MustCompile(`процент|%`)
-	reWord       = regexp.MustCompile(`[а-я]+`)
-	reLines      = regexp.MustCompile(`(\d{1,3})\s*(строк|строч|штук)|(строк|строч)\s*(\d{1,3})|штук\s*(\d{1,3})`)
-	reUp         = regexp.MustCompile(`(прибавь|добавь|погромче|громче)`)
-	reDown       = regexp.MustCompile(`(потише|тише|сбавь|убавь|слишком громко|слишком шумно)`)
-	reBright     = regexp.MustCompile(`(яркост|подсветк|экран)`)
-	reBrightUp   = regexp.MustCompile(`(ярче|светлее|поярче)`)
-	reBrightDn   = regexp.MustCompile(`(темнее|потемнее|тусклее|притуши|приглуши|убавь)`)
-	reMuteOff    = regexp.MustCompile(`(размуть|сними[а-я]*.*беззвуч|верни звук|включи звук|убери беззвуч)`)
-	reMuteOn     = regexp.MustCompile(`(заглуши|выключи звук|выруби звук|беззвучн|mute)`)
-	reSleepOff   = regexp.MustCompile(`(разреши|можно|можешь|пусть|пускай|сними)[а-я]*.*(спать|сон|засып|гасн)|сними запрет`)
-	reSleepOn    = regexp.MustCompile(`(запрети|не давай|не дай|не гас|не выключай).*(спать|сон|засып|гасн|гаси|экран)`)
-	reConnect    = regexp.MustCompile(`(подключ|переключ|перейди|перекинь|включи|вруби|сделай активной)`)
+	reUnsupported = regexp.MustCompile(`ютуб|youtube|камер|скриншот|будильник|погод|смс|позвони|звонок|фонар|браузер|файл|диск|перевод|калькул|видео|музык|телеграм|whatsapp|инстаграм|фото|врем|час`)
+	reSupported   = regexp.MustCompile(`заряд|батаре|аккумулятор|вайфай|wifi|вафл|громк|громч|звук|тише|яркост|подсветк|служб|сервис|демон|лог|журнал|спать|сон|спит|засып|гасн|беззвуч|mute|networkmanager|bluetooth|блютуз|modemmanager|avahi|resolved|timesyncd|power-profiles|keentic`)
+	reBtToggle    = regexp.MustCompile(`(активир|включ|выключ|отключ|вруб|отруб)[а-я]*\s+(bluetooth|блютуз)`)
+	reSSH         = regexp.MustCompile(`(^|[^a-z])sshd?([^a-z]|$)`)
+	reWifiVerb    = regexp.MustCompile(`(включ|вруб|выключ|отключ|отруб|погаси|активир)[а-я]*\s+(вайфай|wifi|вафл|беспроводн)`)
+	reAllUnits    = regexp.MustCompile(verbAlt + `[а-я]*.*(все|всех|кажд)[а-я]*\s+` + unitAlt + `|` + verbAlt + `[а-я]*.*все`)
+	reStopUnit    = regexp.MustCompile(`(останов|выключ|приостанов|погаси)[а-я]*\s+` + unitAlt)
+	reArith       = regexp.MustCompile(`(скольк|посчита|вычисли|умнож|раздели|подели|сложи)[а-я]*.*\d+\s*(\*|x|х|умнож|плюс|минус|раздел|дел|слож)|(умнож|раздел|подел|сложи|посчита)[а-я]*.*\d+.*\d+`)
+	reAllLogs     = regexp.MustCompile(`(все|всех|кажд)[а-я]*\s+(служб|сервис|демон)`)
+	reNetName     = regexp.MustCompile(`[A-Za-z][A-Za-z0-9._-]*[0-9][A-Za-z0-9._-]*|[A-Za-z][A-Za-z0-9._-]*-[A-Za-z0-9._-]+`)
+	reBattery     = regexp.MustCompile(`(заряд|батаре|аккумулятор)`)
+	reServices    = regexp.MustCompile(`(какие|список|что|перечисли)[а-я]*.*(служб|сервис|демон)`)
+	reWifi        = regexp.MustCompile(`(вафл|вайфа|wifi|беспроводн)`)
+	reLogs        = regexp.MustCompile(`(лог|журнал|строк|строч)`)
+	reRestart     = regexp.MustCompile(verbAlt)
+	reVolume      = regexp.MustCompile(`(громк|громч|звук|тише|потише)`)
+	reAskLevel    = regexp.MustCompile(`(скольк|какая|какой|уровень|чему|покажи|стоит|выставлен)`)
+	reDigit       = regexp.MustCompile(`\d{1,3}`)
+	reCountWords  = regexp.MustCompile(`строк|строч|штук`)
+	rePercent     = regexp.MustCompile(`процент|%`)
+	reWord        = regexp.MustCompile(`[а-я]+`)
+	reLines       = regexp.MustCompile(`(\d{1,3})\s*(строк|строч|штук)|(строк|строч)\s*(\d{1,3})|штук\s*(\d{1,3})`)
+	reUp          = regexp.MustCompile(`(прибавь|добавь|погромче|громче)`)
+	reDown        = regexp.MustCompile(`(потише|тише|сбавь|убавь|слишком громко|слишком шумно)`)
+	reBright      = regexp.MustCompile(`(яркост|подсветк|экран)`)
+	reBrightUp    = regexp.MustCompile(`(ярче|светлее|поярче)`)
+	reBrightDn    = regexp.MustCompile(`(темнее|потемнее|тусклее|притуши|приглуши|убавь)`)
+	reMuteOff     = regexp.MustCompile(`(размуть|сними[а-я]*.*беззвуч|верни звук|включи звук|убери беззвуч)`)
+	reMuteOn      = regexp.MustCompile(`(заглуши|выключи звук|выруби звук|беззвучн|mute)`)
+	reSleepOff    = regexp.MustCompile(`(разреши|можно|можешь|пусть|пускай|сними)[а-я]*.*(спать|сон|засып|гасн)|сними запрет`)
+	reSleepOn     = regexp.MustCompile(`(запрети|не давай|не дай|не гас|не выключай).*(спать|сон|засып|гасн|гаси|экран)|не спит`)
+	reConnect     = regexp.MustCompile(`(подключ|переключ|перейди|перекинь|включи|вруби|сделай активной)`)
 )
 
 var numWords = map[string]int{
@@ -97,6 +100,10 @@ func Refusal(q string) (string, bool) {
 	case reArith.MatchString(t):
 		return refusal, true
 	case reLogs.MatchString(t) && reAllLogs.MatchString(t):
+		return refusal, true
+	case reBtToggle.MatchString(t):
+		return refusal, true
+	case reUnsupported.MatchString(t) && !reSupported.MatchString(t):
 		return refusal, true
 	}
 	return "", false

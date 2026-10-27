@@ -23,6 +23,15 @@ func TestRefusal(t *testing.T) {
 		"сколько будет 17 умножить на 23?",
 		"посчитай 48 разделить на 6",
 		"умножь 12 на 9",
+		"подели 100 на 4",
+		"активируй bluetooth",
+		"запусти камеру",
+		"запусти youtube",
+		"сними скриншот экрана",
+		"поставь будильник на 6",
+		"какая погода",
+		"отправь смс маме",
+		"время подскажи",
 	}
 	no := []string{
 		"какой заряд батареи?",
@@ -30,10 +39,8 @@ func TestRefusal(t *testing.T) {
 		"подключись к Keenetic-9135",
 		"переключи вайфай на сеть Keenetic-9135",
 		"покажи вафлю",
+		"покажи логи за последнее время",
 		"выключи звук",
-		"какая погода завтра",
-		"сколько время",
-		"открой youtube",
 	}
 	for _, q := range yes {
 		if _, ok := Refusal(q); !ok {
@@ -84,6 +91,7 @@ func TestPreroute(t *testing.T) {
 		{"пускай экран гаснет когда хочет", "nosleep_set", map[string]any{"mode": "off"}},
 		{"запрети экрану гаснуть", "nosleep_set", map[string]any{"mode": "on"}},
 		{"не давай телефону уходить в сон", "nosleep_set", map[string]any{"mode": "on"}},
+		{"пусть телефон не спит", "nosleep_set", map[string]any{"mode": "on"}},
 		{"не гаси экран, я читаю", "nosleep_set", map[string]any{"mode": "on"}},
 		{"покажи последние 100 строк журнала блютуза", "service_logs", map[string]any{"unit": "bluetooth", "lines": 100}},
 		{"avahi-daemon логи покажи, штук 15", "service_logs", map[string]any{"unit": "avahi-daemon", "lines": 15}},
@@ -116,8 +124,6 @@ func TestPreroute(t *testing.T) {
 	no := []string{
 		"напиши стих про осень",
 		"поставь будильник на 7 утра",
-		"какая погода завтра",
-		"открой youtube",
 		"заблокируй экран телефона",
 		"перезапусти все службы",
 		"включи вайфай",
