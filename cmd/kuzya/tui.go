@@ -20,6 +20,10 @@ func bold(s string) string   { return paint("1", s) }
 func cyan(s string) string   { return paint("1;36", s) }
 func yellow(s string) string { return paint("1;33", s) }
 func red(s string) string    { return paint("1;31", s) }
+func green(s string) string  { return paint("1;32", s) }
+
+// rule — тонкая линия для рамок в духе Claude/opencode.
+func rule() string { return dim(strings.Repeat("─", 46)) }
 
 // modelLabel — короткое имя текущей модели для шапки и подсказок.
 func modelLabel() string {

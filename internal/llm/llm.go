@@ -43,12 +43,15 @@ func New() *Client {
 }
 
 // ChatRemote отправляет запрос удалённой OpenAI-совместимой модели.
-func (c *Client) ChatRemote(msgs []Message, url, key, model string) (Message, error) {
+func (c *Client) ChatRemote(msgs []Message, tools []map[string]any, url, key, model string) (Message, error) {
 	body := map[string]any{
 		"model":       model,
 		"messages":    msgs,
-		"temperature": 0.3,
+		"temperature": 0,
 		"max_tokens":  512,
+	}
+	if len(tools) > 0 {
+		body["tools"] = tools
 	}
 	b, err := json.Marshal(body)
 	if err != nil {

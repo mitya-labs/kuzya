@@ -26,11 +26,12 @@ func main() {
 		return
 	}
 	printLogo(os.Stdout, os.Stdout)
-	fmt.Println(cyan("Кузя") + dim(" · домовой skladenOS") + dim("   модель: "+modelLabel()))
-	fmt.Println(dim("? вопрос — разговор") + dim("   @ вопрос — удалённая модель") + dim("   /help — команды"))
-	fmt.Println(dim("/reset — забыть разговор, /exit — выйти"))
+	fmt.Println(rule())
+	fmt.Println(" " + bold("Кузя") + dim(" · офлайн-агент skladenOS"))
+	fmt.Println(" " + dim("модель ") + cyan(modelLabel()) + dim("   ·   ? разговор") + dim("   ·   ! удалённая") + dim("   ·   /help"))
+	fmt.Println(rule())
 	for {
-		fmt.Print(cyan("кузя") + cyan("> "))
+		fmt.Print(cyan("› "))
 		line, err := in.ReadString('\n')
 		line = strings.TrimSpace(line)
 		switch line {
@@ -39,14 +40,17 @@ func main() {
 			return
 		case "/reset", "/сброс":
 			a.Reset()
-			fmt.Println("Забыл.")
+			fmt.Println(dim("Забыл."))
 		case "/help", "/?", "/помощь":
-			fmt.Println(cyan("?") + " вопрос — разговор (удалённая модель, если настроена)")
-			fmt.Println(cyan("@") + " вопрос — принудительно удалённая модель")
-			fmt.Println(cyan("/reset") + dim(" (/сброс) — забыть разговор") + dim("   ") + cyan("/exit") + dim(" (/quit, /выход) — выйти, Ctrl-D — тоже выход"))
+			fmt.Println(rule())
+			fmt.Println(" " + cyan("?") + " текст — разговор (удалённая модель, если настроена)")
+			fmt.Println(" " + cyan("!") + " или " + cyan("@") + " текст — принудительно удалённая модель")
+			fmt.Println(" " + cyan("/reset") + " — забыть разговор")
+			fmt.Println(" " + cyan("/exit") + " — выйти")
+			fmt.Println(rule())
 		default:
 			if strings.HasPrefix(line, "/") {
-				fmt.Println("Нет такой команды. /help — список.")
+				fmt.Println(dim("Нет такой команды. /help — список."))
 				break
 			}
 			a = answer(a, confirm, line)
@@ -88,7 +92,8 @@ func answer(a *agent.Agent, confirm func(string) bool, prompt string) *agent.Age
 			}
 		}
 		if isChatRefusal(out) {
-			fmt.Println(out)
+			fmt.Println()
+			fmt.Println(green("●") + " " + out)
 			fmt.Println(dim("Локальная модель не умеет общаться. Настрой удалённую: KUZYA_REMOTE_URL/KEY/MODEL."))
 			return a
 		}
@@ -96,7 +101,8 @@ func answer(a *agent.Agent, confirm func(string) bool, prompt string) *agent.Age
 	if strings.TrimSpace(out) == "" {
 		out = dim("(пусто)")
 	}
-	fmt.Println(out)
+	fmt.Println()
+	fmt.Println(green("●") + " " + out)
 	return a
 }
 

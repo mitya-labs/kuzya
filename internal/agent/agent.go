@@ -33,6 +33,39 @@ func New(c *llm.Client, confirm func(string) bool) *Agent {
 	return a
 }
 
+// runRemote — удалённая модель вызывает инструменты телефона; опасные действия
+// подтверждает пользователь, как и в локальном режиме.
+func (a *Agent) runRemote(q, url, key, model string) (string, error) {
+	msgs := []llm.Message{
+		{Role: "system", Content: "Ты — удалённый помощник агента Кузя на телефоне skladenOS. Ты можешь вызывать инструменты телефона; опасные действия подтверждает пользователь. Отвечай кратко, по-русски."},
+		{Role: "user", Content: q},
+	}
+	last := ""
+	for i := 0; i < MaxSteps; i++ {
+		reply, err := a.LLM.ChatRemote(msgs, tools.Schemas(), url, key, model)
+		if err != nil {
+			return "", err
+		}
+		reply.Role = "assistant"
+		msgs = append(msgs, reply)
+		if len(reply.ToolCalls) == 0 {
+			return strings.TrimSpace(reply.Content), nil
+		}
+		for _, c := range reply.ToolCalls {
+			out, ok := a.call(c.Function)
+			if !ok {
+				return fmt.Sprintf("Отменено: «%s» не выполнен.", c.Function.Name), nil
+			}
+			last = out
+			msgs = append(msgs, llm.Message{Role: "tool", ToolCallID: c.ID, Content: out})
+		}
+	}
+	if last != "" {
+		return last, nil
+	}
+	return "Не уложился в лимит шагов.", nil
+}
+
 // remoteEnv читает настройки удалённой модели из окружения.
 func remoteEnv() (string, string, string, bool) {
 	url, key, model := os.Getenv("KUZYA_REMOTE_URL"), os.Getenv("KUZYA_REMOTE_KEY"), os.Getenv("KUZYA_REMOTE_MODEL")
@@ -45,22 +78,26 @@ func (a *Agent) Reset() {
 
 // Run добавляет реплику пользователя и крутит цикл до ответа без вызовов.
 func (a *Agent) Run(prompt string) (string, error) {
-	// «@» — принудительно удалённая модель; «?» — разговор, тоже удалённый, если настроен.
-	if strings.HasPrefix(strings.TrimSpace(prompt), "@") || strings.HasPrefix(strings.TrimSpace(prompt), "?") {
+	// «@»/«!» — удалённый мозг с локальными инструментами; «?» — только разговор.
+	if strings.HasPrefix(strings.TrimSpace(prompt), "@") || strings.HasPrefix(strings.TrimSpace(prompt), "!") || strings.HasPrefix(strings.TrimSpace(prompt), "?") {
 		mark := strings.TrimSpace(prompt)[:1]
 		q := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(prompt), mark))
-		if url, key, model, ok := remoteEnv(); ok {
+		url, key, model, ok := remoteEnv()
+		if mark == "@" || mark == "!" {
+			if !ok {
+				return "Удалённая модель не настроена: задай KUZYA_REMOTE_URL, KUZYA_REMOTE_KEY и KUZYA_REMOTE_MODEL.", nil
+			}
+			return a.runRemote(q, url, key, model)
+		}
+		if ok {
 			reply, err := a.LLM.ChatRemote([]llm.Message{
-				{Role: "system", Content: "Ты — Кузя, офлайн-агент skladenOS. Отвечай коротко, по-русски."},
+				{Role: "system", Content: "Ты — удалённый помощник. Отвечай кратко, по-русски."},
 				{Role: "user", Content: q},
-			}, url, key, model)
+			}, nil, url, key, model)
 			if err != nil {
 				return "", err
 			}
 			return strings.TrimSpace(reply.Content), nil
-		}
-		if mark == "@" {
-			return "Удалённая модель не настроена: задай KUZYA_REMOTE_URL, KUZYA_REMOTE_KEY и KUZYA_REMOTE_MODEL.", nil
 		}
 		// «?» без удалённой модели — локальный текстовый ответ (без инструментов).
 		msgs := []llm.Message{

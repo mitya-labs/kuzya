@@ -117,3 +117,39 @@ func TestQuestionUsesRemote(t *testing.T) {
 		t.Fatalf("out=%q err=%v", out, err)
 	}
 }
+
+func TestRemoteCallsLocalTool(t *testing.T) {
+	n := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		n++
+		if n == 1 {
+			json.NewEncoder(w).Encode(map[string]any{"choices": []map[string]any{{
+				"message": map[string]any{"role": "assistant", "tool_calls": []map[string]any{{
+					"id": "1", "type": "function",
+					"function": map[string]any{"name": "remote_echo", "arguments": `{"text":"hi"}`},
+				}}},
+			}}})
+			return
+		}
+		json.NewEncoder(w).Encode(map[string]any{"choices": []map[string]any{{
+			"message": map[string]any{"role": "assistant", "content": "готово"},
+		}}})
+	}))
+	t.Cleanup(srv.Close)
+	t.Setenv("KUZYA_REMOTE_URL", srv.URL)
+	t.Setenv("KUZYA_REMOTE_KEY", "k")
+	t.Setenv("KUZYA_REMOTE_MODEL", "m")
+	ran := 0
+	tools.Register(tools.Tool{
+		Name: "remote_echo", Description: "test",
+		Run: func(args map[string]any) (string, error) { ran++; return args["text"].(string), nil },
+	})
+	a := New(&llm.Client{}, nil)
+	out, err := a.Run("! сделай")
+	if err != nil || out != "готово" {
+		t.Fatalf("out=%q err=%v", out, err)
+	}
+	if ran != 1 {
+		t.Fatalf("инструмент вызван %d раз", ran)
+	}
+}

@@ -23,7 +23,7 @@ func TestChatRemote(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 	c := &Client{HTTP: srv.Client()}
-	msg, err := c.ChatRemote([]Message{{Role: "user", Content: "привет"}}, srv.URL, "test-key", "remote-model")
+	msg, err := c.ChatRemote([]Message{{Role: "user", Content: "привет"}}, nil, srv.URL, "test-key", "remote-model")
 	if err != nil || msg.Content != "ответ" {
 		t.Fatalf("msg=%q err=%v", msg.Content, err)
 	}
