@@ -54,6 +54,19 @@ func TestRefusal(t *testing.T) {
 	}
 }
 
+func TestHelp(t *testing.T) {
+	for _, q := range []string{"а что ты умеешь?", "что умеешь", "что ты можешь?", "какие команды", "помощь"} {
+		if _, ok := Help(q); !ok {
+			t.Errorf("Help(%q) = false", q)
+		}
+	}
+	for _, q := range []string{"что ты можешь сделать с яркостью", "какой заряд батареи?", "включи вайфай"} {
+		if _, ok := Help(q); ok {
+			t.Errorf("Help(%q) сработал зря", q)
+		}
+	}
+}
+
 func TestPreroute(t *testing.T) {
 	yes := []struct {
 		q    string

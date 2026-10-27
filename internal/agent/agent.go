@@ -38,6 +38,12 @@ func (a *Agent) Reset() {
 
 // Run добавляет реплику пользователя и крутит цикл до ответа без вызовов.
 func (a *Agent) Run(prompt string) (string, error) {
+	// Вопрос о возможностях — статический ответ, модель для него не нужна.
+	if msg, ok := rules.Help(prompt); ok {
+		a.History = append(a.History, llm.Message{Role: "user", Content: prompt}, llm.Message{Role: "assistant", Content: msg})
+		a.trim()
+		return msg, nil
+	}
 	// Жёсткие негативы и очевидные команды решаем без модели: это и точнее, и дешевле.
 	if msg, ok := rules.Refusal(prompt); ok {
 		a.History = append(a.History, llm.Message{Role: "user", Content: prompt}, llm.Message{Role: "assistant", Content: msg})

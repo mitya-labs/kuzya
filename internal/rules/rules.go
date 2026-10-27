@@ -85,6 +85,25 @@ var units = []struct {
 	{regexp.MustCompile(`power-profiles`), "power-profiles-daemon"},
 }
 
+const helpText = `Умею:
+• заряд батареи;
+• Wi-Fi: статус и подключение к сохранённой сети;
+• службы: список, журнал и перезапуск (NetworkManager, bluetooth, ModemManager, avahi-daemon, systemd-resolved, systemd-timesyncd, power-profiles-daemon);
+• сон: запретить или разрешить;
+• звук: громкость, шаг, mute;
+• экран: яркость и шаг.
+Не умею: включать/выключать Wi-Fi, останавливать службы, ssh, файлы, звонки, будильник, фонарик, браузер, перевод, вычисления, питание телефона.`
+
+var reHelp = regexp.MustCompile(`(что ты умеешь|что умеешь|что ты можешь|что можешь|какие команды|какие возможности|что по функциям|помощь|help)\s*\??$`)
+
+// Help отвечает на вопрос о возможностях без модели.
+func Help(q string) (string, bool) {
+	if reHelp.MatchString(norm(q)) {
+		return helpText, true
+	}
+	return "", false
+}
+
 // Refusal возвращает готовый отказ, если запрос заведомо вне возможностей Кузи.
 func Refusal(q string) (string, bool) {
 	t := norm(q)
