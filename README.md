@@ -2,6 +2,8 @@
 
 # Кузя
 
+Модели: [nafanya-1.7b](https://huggingface.co/MityaLabs/nafanya-1.7b) · [nafanya-0.8b](https://huggingface.co/MityaLabs/nafanya-0.8b)
+
 Локальный офлайн-агент-домовой для skladenOS и Skladen (Poco F1).
 Настраивает систему и помогает с ней работать без сети: маленькая квантованная
 модель (llama.cpp) + белый список инструментов + поиск по локальной документации.
