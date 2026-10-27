@@ -46,6 +46,7 @@ func init() {
 	Register(Tool{
 		Name:        "volume_get",
 		Description: "Текущая громкость в процентах и выключен ли звук.",
+		Short:       "Текущая громкость и выключен ли звук",
 		Run: func(map[string]any) (string, error) {
 			out, err := execCmd("wpctl", "get-volume", sink)
 			if err != nil {
@@ -58,6 +59,7 @@ func init() {
 	Register(Tool{
 		Name:        "mute_set",
 		Description: "Заглушить звук (mode=on: «выключи звук», «заглуши», mute) или вернуть звук (mode=off: «включи звук», «верни звук», unmute). Уровень громкости не меняет.",
+		Short:       "Заглушить (on) или вернуть звук (off)",
 		Params: map[string]any{"mode": map[string]any{
 			"type": "string", "enum": []string{"on", "off"}, "description": "on — заглушить звук, off — вернуть звук",
 		}},

@@ -182,3 +182,31 @@ func TestSysfsTools(t *testing.T) {
 		t.Error("яркость 0% должна отклоняться (чёрный экран)")
 	}
 }
+
+func TestSchemasCompact(t *testing.T) {
+	byName := map[string]map[string]any{}
+	for _, s := range Schemas() {
+		fn := s["function"].(map[string]any)
+		byName[fn["name"].(string)] = fn
+	}
+	if len(byName) != 13 {
+		t.Fatalf("ждали 13 инструментов, получили %d", len(byName))
+	}
+	battery := byName["battery_status"]["description"].(string)
+	if battery != "Заряд батареи и состояние (заряжается/разряжается)" {
+		t.Errorf("компактное описание battery_status=%q", battery)
+	}
+	mode := byName["mute_set"]["parameters"].(map[string]any)["properties"].(map[string]any)["mode"].(map[string]any)
+	if _, ok := mode["description"]; ok {
+		t.Error("в компактной схеме у параметров не должно быть description")
+	}
+	if _, ok := mode["enum"]; !ok {
+		t.Error("enum должен сохраняться в компактной схеме")
+	}
+	for _, s := range SchemasFull() {
+		fn := s["function"].(map[string]any)
+		if fn["description"] == "" {
+			t.Errorf("%v: пустое подробное описание", fn["name"])
+		}
+	}
+}

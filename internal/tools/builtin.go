@@ -39,6 +39,7 @@ func init() {
 	Register(Tool{
 		Name:        "battery_status",
 		Description: "Заряд батареи в процентах и состояние (заряжается/разряжается).",
+		Short:       "Заряд батареи и состояние (заряжается/разряжается)",
 		Run: func(map[string]any) (string, error) {
 			c, err := readFirst("class/power_supply/*battery/capacity")
 			if err != nil {
@@ -52,6 +53,7 @@ func init() {
 	Register(Tool{
 		Name:        "wifi_status",
 		Description: "Только показать состояние Wi-Fi: активное подключение и список сохранённых сетей (имена для wifi_connect). Ничего не подключает.",
+		Short:       "Показать активную Wi-Fi сеть и сохранённые сети",
 		Run: func(map[string]any) (string, error) {
 			dev, err := execCmd("nmcli", "-t", "-f", "DEVICE,TYPE,STATE,CONNECTION", "device", "status")
 			if err != nil {
@@ -65,6 +67,7 @@ func init() {
 	Register(Tool{
 		Name:        "wifi_connect",
 		Description: "Подключиться или переключиться на сохранённую Wi-Fi сеть, когда пользователь просит подключить и называет имя сети («подключись к…», «перейди на…», connect). Пароль не вводится.",
+		Short:       "Подключиться к сохранённой Wi-Fi сети по имени",
 		Params:      map[string]any{"connection": str("имя сохранённого подключения из wifi_status")},
 		Required:    []string{"connection"},
 		Dangerous:   true,
@@ -83,6 +86,7 @@ func init() {
 	Register(Tool{
 		Name:        "services_running",
 		Description: "Список запущенных системных сервисов («что запущено», «что крутится в системе», «какие демоны»).",
+		Short:       "Список запущенных системных сервисов",
 		Run: func(map[string]any) (string, error) {
 			return execCmd("systemctl", "list-units", "--type=service", "--state=running", "--no-legend", "--plain", "--no-pager")
 		},
@@ -91,6 +95,7 @@ func init() {
 	Register(Tool{
 		Name:        "service_logs",
 		Description: "Последние строки журнала сервиса из списка: NetworkManager, bluetooth, ModemManager, avahi-daemon, systemd-resolved, systemd-timesyncd, power-profiles-daemon.",
+		Short:       "Последние строки журнала сервиса из списка",
 		Params: map[string]any{
 			"unit":  str("имя сервиса из списка, например NetworkManager"),
 			"lines": num("сколько строк, по умолчанию 30, максимум 200"),
@@ -121,6 +126,7 @@ func init() {
 	Register(Tool{
 		Name:        "service_restart",
 		Description: "Перезапустить сервис из белого списка: NetworkManager, bluetooth, ModemManager, avahi-daemon, systemd-resolved, systemd-timesyncd, power-profiles-daemon.",
+		Short:       "Перезапустить сервис из списка",
 		Params:      map[string]any{"unit": str("имя сервиса")},
 		Required:    []string{"unit"},
 		Dangerous:   true,
@@ -146,6 +152,7 @@ func init() {
 	Register(Tool{
 		Name:        "nosleep_set",
 		Description: "Не давать телефону засыпать и гасить экран (mode=on: «не давай засыпать», «запрети засыпать») или разрешить сон (mode=off: «разреши спать», «можно засыпать»).",
+		Short:       "Запретить сон (on) или разрешить (off)",
 		Params: map[string]any{"mode": map[string]any{
 			"type": "string", "enum": []string{"on", "off"}, "description": "on — запретить сон, off — разрешить сон",
 		}},
@@ -166,6 +173,7 @@ func init() {
 	Register(Tool{
 		Name:        "volume_set",
 		Description: "Установить громкость звука в процентах (0–100): «громкость 40», «на половину», «на максимум». Не яркость экрана.",
+		Short:       "Установить громкость 0–100",
 		Params:      map[string]any{"percent": num("громкость, 0–100")},
 		Required:    []string{"percent"},
 		Dangerous:   true,
@@ -181,6 +189,7 @@ func init() {
 	Register(Tool{
 		Name:        "volume_step",
 		Description: "Сделать звук громче или тише на шаг, когда число не названо: «погромче», «потише». Не яркость экрана.",
+		Short:       "Сделать громче или тише на шаг",
 		Params:      map[string]any{"direction": str("up — громче, down — тише")},
 		Required:    []string{"direction"},
 		Dangerous:   true,
@@ -200,6 +209,7 @@ func init() {
 	Register(Tool{
 		Name:        "brightness_set",
 		Description: "Установить яркость экрана (подсветки) в процентах (5–100): «яркость 60», «на максимум». Не громкость звука.",
+		Short:       "Установить яркость экрана 5–100",
 		Params:      map[string]any{"percent": num("яркость, 5–100")},
 		Required:    []string{"percent"},
 		Dangerous:   true,
@@ -215,6 +225,7 @@ func init() {
 	Register(Tool{
 		Name:        "brightness_step",
 		Description: "Сделать экран ярче или темнее на шаг, когда число не названо: «ярче», «потемнее». Не громкость звука.",
+		Short:       "Сделать экран ярче или темнее на шаг",
 		Params:      map[string]any{"direction": str("up — ярче, down — темнее")},
 		Required:    []string{"direction"},
 		Dangerous:   true,

@@ -39,9 +39,15 @@ func main() {
 	casesPath := flag.String("cases", "tests/cases.json", "файл с запросами")
 	out := flag.String("out", "", "куда писать подробный результат (jsonl)")
 	systemFile := flag.String("system", "", "файл с системным промптом (по умолчанию agent.System)")
+	full := flag.Bool("full", false, "полный промпт и подробные описания инструментов (для базовых моделей)")
 	flag.Parse()
 
 	system := agent.System
+	schemas := tools.Schemas
+	if *full {
+		system = agent.SystemFull
+		schemas = tools.SchemasFull
+	}
 	if *systemFile != "" {
 		b, err := os.ReadFile(*systemFile)
 		if err != nil {
@@ -68,7 +74,7 @@ func main() {
 		r := Result{Case: c}
 		start := time.Now()
 		msgs := []llm.Message{{Role: "system", Content: system}, {Role: "user", Content: c.Q}}
-		reply, err := client.Chat(msgs, tools.Schemas())
+		reply, err := client.Chat(msgs, schemas())
 		r.Seconds = time.Since(start).Seconds()
 		if err != nil {
 			r.Err = err.Error()

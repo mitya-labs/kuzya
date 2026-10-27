@@ -5,7 +5,7 @@
 # Кэш относится к модели, флагам, системному промпту и схемам инструментов; при смене промпта/инструментов
 # удалить $KUZYA_HOME/slots/*.bin (при несовпадении префикса сервер пересчитает только расхождение).
 KH="${KUZYA_HOME:-$HOME/kuzya}"
-MODEL="${KUZYA_MODEL:-gemma-4-E2B-it-Q4_K_M}"
+MODEL="${KUZYA_MODEL:-nafanya-1.7b-Q4_K_M}"
 URL="http://127.0.0.1:8080"
 SLOT="$MODEL.bin"
 PIDFILE="$KH/server.pid"
