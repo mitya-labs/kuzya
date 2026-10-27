@@ -37,6 +37,7 @@ kuzya "подключи Wi-Fi"
   `docker build --platform linux/arm64 --target out --output type=local,dest=build/out -f build/Dockerfile build`
 - Copy `build/out/*` and a `.gguf` model to the phone (`~/kuzya/bin`, `~/kuzya/models`); models are not in git / модели не в git.
 - Run `llama-server --jinja -m <model>.gguf` on the phone, then `kuzya`. Server address: `KUZYA_URL`, default `http://127.0.0.1:8080/v1/chat/completions`.
+- Talk vs tools / Разговор и инструменты: `? вопрос` — ответ текстом без инструментов; `@ вопрос` — запрос к удалённой OpenAI-совместимой модели (только если заданы `KUZYA_REMOTE_URL`, `KUZYA_REMOTE_KEY`, `KUZYA_REMOTE_MODEL`). Это единственный сетевой выход и только по явному тегу. Если 0.8B в режиме `?` отвечает «не умею», агент сам перезапускает сервер на 1.7B и повторяет запрос.
 - Model switch / Переключение модели: `KUZYA_MODEL=nafanya-1.7b-Q4_K_M kuzya "…"` (default) or `KUZYA_MODEL=nafanya-0.8b-Q4_K_M kuzya "…"`. `kuzya-server` restarts itself when the model changes and keeps a separate slot cache per model. / При смене модели сервер перезапускается сам, кэш слота у каждой модели свой.
 
 | Model | Fresh sets (rules) | Peak RAM | Warm energy | Use |

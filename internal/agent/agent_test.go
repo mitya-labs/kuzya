@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"kuzya/internal/llm"
@@ -86,5 +87,16 @@ func TestTextOnlyPrefix(t *testing.T) {
 	}
 	if _, ok := body["tools"]; ok {
 		t.Fatal("в режиме «?» инструменты отправляться не должны")
+	}
+}
+
+func TestRemoteNotConfigured(t *testing.T) {
+	t.Setenv("KUZYA_REMOTE_URL", "")
+	t.Setenv("KUZYA_REMOTE_KEY", "")
+	t.Setenv("KUZYA_REMOTE_MODEL", "")
+	a := New(nil, nil)
+	out, err := a.Run("@привет")
+	if err != nil || !strings.Contains(out, "не настроена") {
+		t.Fatalf("out=%q err=%v", out, err)
 	}
 }

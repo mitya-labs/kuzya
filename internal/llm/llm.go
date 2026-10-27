@@ -42,6 +42,51 @@ func New() *Client {
 	return &Client{URL: url, HTTP: &http.Client{Timeout: 5 * time.Minute}}
 }
 
+// ChatRemote отправляет запрос удалённой OpenAI-совместимой модели.
+func (c *Client) ChatRemote(msgs []Message, url, key, model string) (Message, error) {
+	body := map[string]any{
+		"model":       model,
+		"messages":    msgs,
+		"temperature": 0.3,
+		"max_tokens":  512,
+	}
+	b, err := json.Marshal(body)
+	if err != nil {
+		return Message{}, err
+	}
+	req, err := http.NewRequest("POST", url, bytes.NewReader(b))
+	if err != nil {
+		return Message{}, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+key)
+	client := &http.Client{Timeout: 60 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return Message{}, err
+	}
+	defer resp.Body.Close()
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return Message{}, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return Message{}, fmt.Errorf("remote model: %s: %s", resp.Status, data)
+	}
+	var out struct {
+		Choices []struct {
+			Message Message `json:"message"`
+		} `json:"choices"`
+	}
+	if err := json.Unmarshal(data, &out); err != nil {
+		return Message{}, err
+	}
+	if len(out.Choices) == 0 {
+		return Message{}, fmt.Errorf("remote model: пустой ответ")
+	}
+	return out.Choices[0].Message, nil
+}
+
 // Chat отправляет историю и схемы инструментов, возвращает ответ модели.
 func (c *Client) Chat(msgs []Message, tools []map[string]any) (Message, error) {
 	// max_tokens: ответ с вызовом инструмента короткий; предел отсекает зацикленную генерацию (были запросы по 155–300 с).
