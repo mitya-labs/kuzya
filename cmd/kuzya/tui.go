@@ -48,7 +48,6 @@ func modelLabel() string {
 	if m == "" {
 		m = modelLarge
 	}
-	m = strings.TrimPrefix(m, "nafanya-")
 	m = strings.TrimSuffix(m, "-Q4_K_M")
 	return m
 }

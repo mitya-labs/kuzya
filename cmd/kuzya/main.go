@@ -17,6 +17,7 @@ import (
 const modelLarge = "nafanya-1.7b-Q4_K_M"
 
 func main() {
+	loadRemoteConfig()
 	// Один запрос: без редактора строк, чтобы работали скрипты и SXMO.
 	if len(os.Args) > 1 {
 		in := bufio.NewReader(os.Stdin)
@@ -85,6 +86,10 @@ func main() {
 		case "/reset", "/сброс":
 			a.Reset()
 			fmt.Println(dim("Забыл."))
+		case "/remote setup", "/remote config", "/remote настройка":
+			remoteSetup(l)
+		case "/remote show", "/remote status":
+			fmt.Println(remoteStatus())
 		case "/remote", "/remote on", "/remote off", "/удалённо", "/удаленно":
 			want := !remoteOnly
 			if strings.HasSuffix(line, " on") || line == "/удалённо" || line == "/удаленно" {
@@ -117,6 +122,8 @@ func main() {
 			fmt.Println(" " + cyan("?") + " текст — разговор (удалённая модель, если настроена)")
 			fmt.Println(" " + cyan("!") + " или " + cyan("@") + " текст — удалённая модель с локальными инструментами")
 			fmt.Println(" " + cyan("/remote") + " — только удалённая модель (локальный сервер останавливается)")
+			fmt.Println(" " + cyan("/remote setup") + " — настроить URL, ключ и модель")
+			fmt.Println(" " + cyan("/remote show") + " — показать настройки (ключ замаскирован)")
 			fmt.Println(" " + cyan("/reset") + " — забыть разговор")
 			fmt.Println(" " + cyan("/exit") + " — выйти")
 			fmt.Println(rule())
