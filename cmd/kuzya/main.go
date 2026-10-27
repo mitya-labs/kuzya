@@ -25,6 +25,7 @@ func main() {
 		answer(a, confirm, strings.Join(os.Args[1:], " "))
 		return
 	}
+	clearScreen()
 	printLogo(os.Stdout, os.Stdout)
 	fmt.Println(rule())
 	fmt.Println(" " + bold("Кузя") + dim(" · офлайн-агент skladenOS"))

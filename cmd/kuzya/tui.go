@@ -22,6 +22,15 @@ func yellow(s string) string { return paint("1;33", s) }
 func red(s string) string    { return paint("1;31", s) }
 func green(s string) string  { return paint("1;32", s) }
 
+// clearScreen очищает видимый экран перед запуском REPL.
+// Отключается через KUZYA_NOCLEAR, TERM=dumb и при выводе не в терминал.
+func clearScreen() {
+	if !isTerminal(os.Stdout) || os.Getenv("TERM") == "dumb" || os.Getenv("KUZYA_NOCLEAR") != "" {
+		return
+	}
+	print("\x1b[H\x1b[2J")
+}
+
 // rule — тонкая линия для рамок в духе Claude/opencode.
 func rule() string { return dim(strings.Repeat("─", 46)) }
 
