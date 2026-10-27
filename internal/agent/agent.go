@@ -38,6 +38,21 @@ func (a *Agent) Reset() {
 
 // Run добавляет реплику пользователя и крутит цикл до ответа без вызовов.
 func (a *Agent) Run(prompt string) (string, error) {
+	// «?» — просто поговорить: инструменты отключены, модель отвечает текстом.
+	if strings.HasPrefix(strings.TrimSpace(prompt), "?") {
+		q := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(prompt), "?"))
+		a.History = append(a.History, llm.Message{Role: "user", Content: q})
+		a.trim()
+		reply, err := a.LLM.Chat(a.History, nil)
+		if err != nil {
+			return "", err
+		}
+		reply.Role = "assistant"
+		reply.ToolCalls = nil
+		a.History = append(a.History, reply)
+		return reply.Content, nil
+	}
+
 	// Вопрос о возможностях — статический ответ, модель для него не нужна.
 	if msg, ok := rules.Help(prompt); ok {
 		a.History = append(a.History, llm.Message{Role: "user", Content: prompt}, llm.Message{Role: "assistant", Content: msg})

@@ -25,6 +25,7 @@ func main() {
 	}
 	printLogo(os.Stdout, os.Stdout)
 	fmt.Println("Кузя, домовой skladenOS")
+	fmt.Println("? вопрос — ответить текстом, без инструментов")
 	fmt.Println("/reset — забыть разговор, /exit — выйти")
 	for {
 		fmt.Print("> ")
@@ -38,6 +39,7 @@ func main() {
 			a.Reset()
 			fmt.Println("Забыл.")
 		case "/help", "/?", "/помощь":
+			fmt.Println("? вопрос — ответить текстом, без инструментов")
 			fmt.Println("/reset (/сброс) — забыть разговор, /exit (/quit, /выход) — выйти, Ctrl-D — тоже выход.")
 		default:
 			if strings.HasPrefix(line, "/") {

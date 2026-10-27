@@ -1,6 +1,9 @@
 package rules
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestRefusal(t *testing.T) {
 	yes := []string{
@@ -58,6 +61,12 @@ func TestHelp(t *testing.T) {
 	for _, q := range []string{"а что ты умеешь?", "что умеешь", "что ты можешь?", "какие команды", "помощь"} {
 		if _, ok := Help(q); !ok {
 			t.Errorf("Help(%q) = false", q)
+		}
+	}
+	for _, q := range []string{"кто ты?", "как тебя зовут?", "представься"} {
+		msg, ok := Help(q)
+		if !ok || !strings.HasPrefix(msg, "Я Кузя") {
+			t.Errorf("Help(%q) = %q, %v: ждали представление", q, msg, ok)
 		}
 	}
 	for _, q := range []string{"что ты можешь сделать с яркостью", "какой заряд батареи?", "включи вайфай"} {

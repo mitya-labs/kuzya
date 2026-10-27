@@ -69,3 +69,22 @@ func TestTrimKeepsUserStart(t *testing.T) {
 		t.Fatalf("плохая обрезка: %v", a.History[:2])
 	}
 }
+
+func TestTextOnlyPrefix(t *testing.T) {
+	var body map[string]any
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = json.NewDecoder(r.Body).Decode(&body)
+		json.NewEncoder(w).Encode(map[string]any{"choices": []map[string]any{{
+			"message": map[string]any{"role": "assistant", "content": "привет"},
+		}}})
+	}))
+	t.Cleanup(srv.Close)
+	a := New(&llm.Client{URL: srv.URL, HTTP: srv.Client()}, nil)
+	out, err := a.Run("? привет, как дела?")
+	if err != nil || out != "привет" {
+		t.Fatalf("out=%q err=%v", out, err)
+	}
+	if _, ok := body["tools"]; ok {
+		t.Fatal("в режиме «?» инструменты отправляться не должны")
+	}
+}

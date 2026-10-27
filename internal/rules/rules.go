@@ -94,11 +94,20 @@ const helpText = `Умею:
 • экран: яркость и шаг.
 Не умею: включать/выключать Wi-Fi, останавливать службы, ssh, файлы, звонки, будильник, фонарик, браузер, перевод, вычисления, питание телефона.`
 
-var reHelp = regexp.MustCompile(`(что ты умеешь|что умеешь|что ты можешь|что можешь|какие команды|какие возможности|что по функциям|помощь|help)\s*\??$`)
+const introText = "Я Кузя — офлайн-агент skladenOS, работаю на телефоне без сети.\n" + helpText
+
+var (
+	reHelp = regexp.MustCompile(`(что ты умеешь|что умеешь|что ты можешь|что можешь|какие команды|какие возможности|что по функциям|помощь|help)\s*\??$`)
+	reWho  = regexp.MustCompile(`(кто ты|ты кто|кто вы|как тебя зовут|как зовут|представься|что ты такое|что ты за)`)
+)
 
 // Help отвечает на вопрос о возможностях без модели.
 func Help(q string) (string, bool) {
-	if reHelp.MatchString(norm(q)) {
+	t := norm(q)
+	if reWho.MatchString(t) {
+		return introText, true
+	}
+	if reHelp.MatchString(t) {
 		return helpText, true
 	}
 	return "", false
