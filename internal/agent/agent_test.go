@@ -100,3 +100,20 @@ func TestRemoteNotConfigured(t *testing.T) {
 		t.Fatalf("out=%q err=%v", out, err)
 	}
 }
+
+func TestQuestionUsesRemote(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]any{"choices": []map[string]any{{
+			"message": map[string]any{"role": "assistant", "content": "привет"},
+		}}})
+	}))
+	t.Cleanup(srv.Close)
+	t.Setenv("KUZYA_REMOTE_URL", srv.URL)
+	t.Setenv("KUZYA_REMOTE_KEY", "k")
+	t.Setenv("KUZYA_REMOTE_MODEL", "m")
+	a := New(&llm.Client{}, nil)
+	out, err := a.Run("? как дела")
+	if err != nil || out != "привет" {
+		t.Fatalf("out=%q err=%v", out, err)
+	}
+}

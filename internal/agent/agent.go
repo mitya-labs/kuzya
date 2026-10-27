@@ -33,35 +33,36 @@ func New(c *llm.Client, confirm func(string) bool) *Agent {
 	return a
 }
 
+// remoteEnv читает настройки удалённой модели из окружения.
+func remoteEnv() (string, string, string, bool) {
+	url, key, model := os.Getenv("KUZYA_REMOTE_URL"), os.Getenv("KUZYA_REMOTE_KEY"), os.Getenv("KUZYA_REMOTE_MODEL")
+	return url, key, model, url != "" && key != "" && model != ""
+}
+
 func (a *Agent) Reset() {
 	a.History = []llm.Message{{Role: "system", Content: System}}
 }
 
 // Run добавляет реплику пользователя и крутит цикл до ответа без вызовов.
 func (a *Agent) Run(prompt string) (string, error) {
-	// «@» — спросить удалённую модель (явный выход в сеть; по умолчанию не настроен).
-	if strings.HasPrefix(strings.TrimSpace(prompt), "@") {
-		q := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(prompt), "@"))
-		url, key, model := os.Getenv("KUZYA_REMOTE_URL"), os.Getenv("KUZYA_REMOTE_KEY"), os.Getenv("KUZYA_REMOTE_MODEL")
-		if url == "" || key == "" || model == "" {
+	// «@» — принудительно удалённая модель; «?» — разговор, тоже удалённый, если настроен.
+	if strings.HasPrefix(strings.TrimSpace(prompt), "@") || strings.HasPrefix(strings.TrimSpace(prompt), "?") {
+		mark := strings.TrimSpace(prompt)[:1]
+		q := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(prompt), mark))
+		if url, key, model, ok := remoteEnv(); ok {
+			reply, err := a.LLM.ChatRemote([]llm.Message{
+				{Role: "system", Content: "Ты — Кузя, офлайн-агент skladenOS. Отвечай коротко, по-русски."},
+				{Role: "user", Content: q},
+			}, url, key, model)
+			if err != nil {
+				return "", err
+			}
+			return strings.TrimSpace(reply.Content), nil
+		}
+		if mark == "@" {
 			return "Удалённая модель не настроена: задай KUZYA_REMOTE_URL, KUZYA_REMOTE_KEY и KUZYA_REMOTE_MODEL.", nil
 		}
-		msgs := []llm.Message{
-			{Role: "system", Content: "Ты — удалённый помощник. Отвечай кратко, по-русски."},
-			{Role: "user", Content: q},
-		}
-		reply, err := a.LLM.ChatRemote(msgs, url, key, model)
-		if err != nil {
-			return "", err
-		}
-		return strings.TrimSpace(reply.Content), nil
-	}
-
-	// «?» — просто поговорить: инструменты отключены, модель отвечает текстом.
-	if strings.HasPrefix(strings.TrimSpace(prompt), "?") {
-		q := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(prompt), "?"))
-		// Для разговора — отдельный системный промпт: без инструментов модель
-		// иначе отвечает «такого инструмента нет» вместо обычного текста.
+		// «?» без удалённой модели — локальный текстовый ответ (без инструментов).
 		msgs := []llm.Message{
 			{Role: "system", Content: "Ты — Кузя, офлайн-агент skladenOS. Отвечай коротко, по-русски, обычным текстом. Инструментов сейчас нет, не предлагай их."},
 			{Role: "user", Content: q},
@@ -70,10 +71,8 @@ func (a *Agent) Run(prompt string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		reply.Role = "assistant"
 		reply.ToolCalls = nil
-		a.History = append(a.History, reply)
-		return reply.Content, nil
+		return strings.TrimSpace(reply.Content), nil
 	}
 
 	// Вопрос о возможностях — статический ответ, модель для него не нужна.

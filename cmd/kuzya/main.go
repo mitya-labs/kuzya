@@ -15,7 +15,7 @@ import (
 func main() {
 	in := bufio.NewReader(os.Stdin)
 	confirm := func(name string) bool {
-		fmt.Printf("Кузя хочет выполнить «%s». Разрешить? [y/N, д/н] ", name)
+		fmt.Printf("%s «%s». Разрешить? [y/N, д/н] ", dim("Кузя хочет выполнить"), yellow(name))
 		s, _ := in.ReadString('\n')
 		return isYes(s)
 	}
@@ -26,12 +26,11 @@ func main() {
 		return
 	}
 	printLogo(os.Stdout, os.Stdout)
-	fmt.Println("Кузя, домовой skladenOS")
-	fmt.Println("? вопрос — ответить текстом, без инструментов")
-	fmt.Println("@ вопрос — спросить удалённую модель (если настроена)")
-	fmt.Println("/reset — забыть разговор, /exit — выйти")
+	fmt.Println(cyan("Кузя") + dim(" · домовой skladenOS") + dim("   модель: "+modelLabel()))
+	fmt.Println(dim("? вопрос — разговор") + dim("   @ вопрос — удалённая модель") + dim("   /help — команды"))
+	fmt.Println(dim("/reset — забыть разговор, /exit — выйти"))
 	for {
-		fmt.Print("> ")
+		fmt.Print(cyan("кузя") + cyan("> "))
 		line, err := in.ReadString('\n')
 		line = strings.TrimSpace(line)
 		switch line {
@@ -42,9 +41,9 @@ func main() {
 			a.Reset()
 			fmt.Println("Забыл.")
 		case "/help", "/?", "/помощь":
-			fmt.Println("? вопрос — ответить текстом, без инструментов")
-			fmt.Println("@ вопрос — спросить удалённую модель (если настроена)")
-			fmt.Println("/reset (/сброс) — забыть разговор, /exit (/quit, /выход) — выйти, Ctrl-D — тоже выход.")
+			fmt.Println(cyan("?") + " вопрос — разговор (удалённая модель, если настроена)")
+			fmt.Println(cyan("@") + " вопрос — принудительно удалённая модель")
+			fmt.Println(cyan("/reset") + dim(" (/сброс) — забыть разговор") + dim("   ") + cyan("/exit") + dim(" (/quit, /выход) — выйти, Ctrl-D — тоже выход"))
 		default:
 			if strings.HasPrefix(line, "/") {
 				fmt.Println("Нет такой команды. /help — список.")
@@ -74,12 +73,12 @@ const modelLarge = "nafanya-1.7b-Q4_K_M"
 func answer(a *agent.Agent, confirm func(string) bool, prompt string) *agent.Agent {
 	out, err := a.Run(prompt)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "ошибка:", err)
+		fmt.Fprintln(os.Stderr, red("ошибка: "+err.Error()))
 		return a
 	}
 	if strings.HasPrefix(strings.TrimSpace(prompt), "?") && isChatRefusal(out) {
 		if isSmallModel() {
-			fmt.Println("0.8B не умеет общаться — переключаюсь на 1.7B…")
+			fmt.Println(dim("0.8B не умеет общаться — переключаюсь на 1.7B…"))
 			if err := switchModel(modelLarge); err == nil {
 				os.Setenv("KUZYA_MODEL", modelLarge)
 				a = agent.New(llm.New(), confirm)
@@ -90,9 +89,12 @@ func answer(a *agent.Agent, confirm func(string) bool, prompt string) *agent.Age
 		}
 		if isChatRefusal(out) {
 			fmt.Println(out)
-			fmt.Println("Локальная модель не умеет общаться. Для разговора: @ вопрос (удалённая модель, если настроена).")
+			fmt.Println(dim("Локальная модель не умеет общаться. Настрой удалённую: KUZYA_REMOTE_URL/KEY/MODEL."))
 			return a
 		}
+	}
+	if strings.TrimSpace(out) == "" {
+		out = dim("(пусто)")
 	}
 	fmt.Println(out)
 	return a
