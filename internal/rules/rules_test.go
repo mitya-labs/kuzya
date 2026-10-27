@@ -63,6 +63,12 @@ func TestHelp(t *testing.T) {
 			t.Errorf("Help(%q) = false", q)
 		}
 	}
+	for _, q := range []string{"какая модель сейчас активна?", "какой моделью ты работаешь?", "что за модель?"} {
+		msg, ok := Help(q)
+		if !ok || !strings.Contains(msg, "Активная локальная модель") {
+			t.Errorf("Help(%q) = %q, %v: ждали инфо о модели", q, msg, ok)
+		}
+	}
 	for _, q := range []string{"кто ты?", "как тебя зовут?", "представься"} {
 		msg, ok := Help(q)
 		if !ok || !strings.HasPrefix(msg, "Я Кузя") {

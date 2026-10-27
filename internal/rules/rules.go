@@ -7,6 +7,7 @@
 package rules
 
 import (
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -97,13 +98,17 @@ const helpText = `Умею:
 const introText = "Я Кузя — офлайн-агент skladenOS, работаю на телефоне без сети.\n" + helpText
 
 var (
-	reHelp = regexp.MustCompile(`(что ты умеешь|что умеешь|что ты можешь|что можешь|какие команды|какие возможности|что по функциям|помощь|help)\s*\??$`)
-	reWho  = regexp.MustCompile(`(кто ты|ты кто|кто вы|как тебя зовут|как зовут|представься|что ты такое|что ты за)`)
+	reHelp  = regexp.MustCompile(`(что ты умеешь|что умеешь|что ты можешь|что можешь|какие команды|какие возможности|что по функциям|помощь|help)\s*\??$`)
+	reWho   = regexp.MustCompile(`(кто ты|ты кто|кто вы|как тебя зовут|как зовут|представься|что ты такое|что ты за)`)
+	reModel = regexp.MustCompile(`(какая|какой|какую|что за)\s+.*модел|модель\s+(сейчас|активн|стоит)|какой моделью`)
 )
 
 // Help отвечает на вопрос о возможностях без модели.
 func Help(q string) (string, bool) {
 	t := norm(q)
+	if reModel.MatchString(t) {
+		return modelText(), true
+	}
 	if reWho.MatchString(t) {
 		return introText, true
 	}
@@ -263,6 +268,25 @@ func Repair(q, tool string, args map[string]any) (string, map[string]any) {
 		}
 	}
 	return tool, args
+}
+
+// modelText — ответ про активную локальную и удалённую модель.
+func modelText() string {
+	local := os.Getenv("KUZYA_MODEL")
+	if local == "" {
+		local = "nafanya-1.7b-Q4_K_M"
+	}
+	desc := "nafanya-1.7b (Qwen3-1.7B + LoRA): 1.71 ГБ, 8.9 Дж/запрос, ~98% с правилами"
+	if strings.Contains(local, "0.8b") {
+		desc = "nafanya-0.8b (Qwen3.5-0.8B + LoRA): 0.92 ГБ, 4.1 Дж/запрос, ~88–98% с правилами"
+	}
+	remote := "не настроена"
+	if os.Getenv("KUZYA_REMOTE_URL") != "" && os.Getenv("KUZYA_REMOTE_KEY") != "" && os.Getenv("KUZYA_REMOTE_MODEL") != "" {
+		remote = os.Getenv("KUZYA_REMOTE_MODEL") + " (" + os.Getenv("KUZYA_REMOTE_URL") + ")"
+	}
+	return "Активная локальная модель: " + local + "\n" + desc +
+		"\nУдалённая модель: " + remote +
+		"\nПереключить локальную: KUZYA_MODEL=nafanya-0.8b-Q4_K_M. Настроить удалённую: /remote setup."
 }
 
 func findUnit(t string) (string, bool) {
