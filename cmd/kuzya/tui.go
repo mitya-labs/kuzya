@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 	"strings"
+
+	"golang.org/x/term"
 )
 
 // colorOn — можно ли раскрашивать вывод: терминал, не NO_COLOR и не TERM=dumb.
@@ -31,8 +33,14 @@ func clearScreen() {
 	print("\x1b[H\x1b[2J")
 }
 
-// rule — тонкая линия для рамок в духе Claude/opencode.
-func rule() string { return dim(strings.Repeat("─", 46)) }
+// rule — тонкая линия во всю ширину терминала (в духе Claude/opencode).
+func rule() string {
+	w := 46
+	if tw, _, err := term.GetSize(int(os.Stdout.Fd())); err == nil && tw > 20 {
+		w = tw - 1
+	}
+	return dim(strings.Repeat("─", w))
+}
 
 // modelLabel — короткое имя текущей модели для шапки и подсказок.
 func modelLabel() string {

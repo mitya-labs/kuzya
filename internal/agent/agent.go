@@ -37,12 +37,13 @@ func New(c *llm.Client, confirm func(string) bool) *Agent {
 // подтверждает пользователь, как и в локальном режиме.
 func (a *Agent) runRemote(q, url, key, model string) (string, error) {
 	msgs := []llm.Message{
-		{Role: "system", Content: "Ты — удалённый помощник агента Кузя на телефоне skladenOS. Ты можешь вызывать инструменты телефона; опасные действия подтверждает пользователь. Отвечай кратко, по-русски."},
+		{Role: "system", Content: "Ты — удалённый помощник агента Кузя на телефоне skladenOS. Ты можешь вызывать инструменты телефона и управлять локальной моделью (local_status, local_switch_model); опасные действия подтверждает пользователь. Отвечай кратко, по-русски.\n\n" + localFacts},
 		{Role: "user", Content: q},
 	}
+	remoteTools := append(append([]map[string]any{}, tools.Schemas()...), remoteSchemas()...)
 	last := ""
 	for i := 0; i < MaxSteps; i++ {
-		reply, err := a.LLM.ChatRemote(msgs, tools.Schemas(), url, key, model)
+		reply, err := a.LLM.ChatRemote(msgs, remoteTools, url, key, model)
 		if err != nil {
 			return "", err
 		}
@@ -52,9 +53,17 @@ func (a *Agent) runRemote(q, url, key, model string) (string, error) {
 			return strings.TrimSpace(reply.Content), nil
 		}
 		for _, c := range reply.ToolCalls {
-			out, ok := a.call(c.Function)
-			if !ok {
-				return fmt.Sprintf("Отменено: «%s» не выполнен.", c.Function.Name), nil
+			var args map[string]any
+			if c.Function.Arguments != "" {
+				_ = json.Unmarshal([]byte(c.Function.Arguments), &args)
+			}
+			out, handled := a.remoteCall(c.Function.Name, args)
+			if !handled {
+				var ok bool
+				out, ok = a.call(c.Function)
+				if !ok {
+					return fmt.Sprintf("Отменено: «%s» не выполнен.", c.Function.Name), nil
+				}
 			}
 			last = out
 			msgs = append(msgs, llm.Message{Role: "tool", ToolCallID: c.ID, Content: out})

@@ -8,23 +8,52 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/peterh/liner"
+
 	"kuzya/internal/agent"
 	"kuzya/internal/llm"
 )
 
+const modelLarge = "nafanya-1.7b-Q4_K_M"
+
 func main() {
-	in := bufio.NewReader(os.Stdin)
+	// Один запрос: без редактора строк, чтобы работали скрипты и SXMO.
+	if len(os.Args) > 1 {
+		in := bufio.NewReader(os.Stdin)
+		confirm := func(name string) bool {
+			fmt.Printf("%s «%s». Разрешить? [y/N, д/н] ", dim("Кузя хочет выполнить"), yellow(name))
+			s, _ := in.ReadString('\n')
+			return isYes(s)
+		}
+		a := agent.New(llm.New(), confirm)
+		answer(a, confirm, strings.Join(os.Args[1:], " "))
+		return
+	}
+
+	l := liner.NewLiner()
+	defer l.Close()
+	l.SetCtrlCAborts(true)
+	hist := filepath.Join(os.Getenv("HOME"), ".kuzya_history")
+	if f, err := os.Open(hist); err == nil {
+		_, _ = l.ReadHistory(f)
+		_ = f.Close()
+	}
+	defer func() {
+		if f, err := os.Create(hist); err == nil {
+			_, _ = l.WriteHistory(f)
+			_ = f.Close()
+		}
+	}()
+
 	confirm := func(name string) bool {
-		fmt.Printf("%s «%s». Разрешить? [y/N, д/н] ", dim("Кузя хочет выполнить"), yellow(name))
-		s, _ := in.ReadString('\n')
+		s, err := l.Prompt(fmt.Sprintf("Кузя хочет выполнить «%s». Разрешить? [y/N, д/н] ", name))
+		if err != nil {
+			return false
+		}
 		return isYes(s)
 	}
 	a := agent.New(llm.New(), confirm)
 
-	if len(os.Args) > 1 { // один запрос, для скриптов и SXMO
-		answer(a, confirm, strings.Join(os.Args[1:], " "))
-		return
-	}
 	clearScreen()
 	printLogo(os.Stdout, os.Stdout)
 	fmt.Println(rule())
@@ -32,9 +61,18 @@ func main() {
 	fmt.Println(" " + dim("модель ") + cyan(modelLabel()) + dim("   ·   ? разговор") + dim("   ·   ! удалённая") + dim("   ·   /help"))
 	fmt.Println(rule())
 	for {
-		fmt.Print(cyan("› "))
-		line, err := in.ReadString('\n')
+		line, err := l.Prompt("› ")
+		if err == liner.ErrPromptAborted {
+			fmt.Println()
+			continue
+		}
+		if err != nil {
+			return
+		}
 		line = strings.TrimSpace(line)
+		if line != "" {
+			l.AppendHistory(line)
+		}
 		switch line {
 		case "":
 		case "/exit", "/quit", "/выход":
@@ -45,7 +83,7 @@ func main() {
 		case "/help", "/?", "/помощь":
 			fmt.Println(rule())
 			fmt.Println(" " + cyan("?") + " текст — разговор (удалённая модель, если настроена)")
-			fmt.Println(" " + cyan("!") + " или " + cyan("@") + " текст — принудительно удалённая модель")
+			fmt.Println(" " + cyan("!") + " или " + cyan("@") + " текст — удалённая модель с локальными инструментами")
 			fmt.Println(" " + cyan("/reset") + " — забыть разговор")
 			fmt.Println(" " + cyan("/exit") + " — выйти")
 			fmt.Println(rule())
@@ -55,9 +93,6 @@ func main() {
 				break
 			}
 			a = answer(a, confirm, line)
-		}
-		if err != nil {
-			return
 		}
 	}
 }
@@ -70,8 +105,6 @@ func isYes(s string) bool {
 	}
 	return false
 }
-
-const modelLarge = "nafanya-1.7b-Q4_K_M"
 
 // answer печатает ответ и возвращает агента: при отказе маленькой модели
 // в текстовом режиме он переключается на 1.7B и повторяет запрос.
@@ -99,12 +132,20 @@ func answer(a *agent.Agent, confirm func(string) bool, prompt string) *agent.Age
 			return a
 		}
 	}
+	out = clean(out)
 	if strings.TrimSpace(out) == "" {
 		out = dim("(пусто)")
 	}
 	fmt.Println()
 	fmt.Println(green("●") + " " + out)
 	return a
+}
+
+// clean убирает markdown-разметку из ответов удалённой модели.
+func clean(s string) string {
+	s = strings.ReplaceAll(s, "**", "")
+	s = strings.ReplaceAll(s, "`", "")
+	return s
 }
 
 func isSmallModel() bool {

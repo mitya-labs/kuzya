@@ -153,3 +153,19 @@ func TestRemoteCallsLocalTool(t *testing.T) {
 		t.Fatalf("инструмент вызван %d раз", ran)
 	}
 }
+
+func TestRemoteTools(t *testing.T) {
+	t.Setenv("KUZYA_MODEL", "nafanya-1.7b-Q4_K_M")
+	a := New(nil, nil)
+	out, ok := a.remoteCall("local_status", nil)
+	if !ok || !strings.Contains(out, "nafanya-1.7b") || !strings.Contains(out, "1.71 ГБ") {
+		t.Fatalf("local_status=%q ok=%v", out, ok)
+	}
+	out, ok = a.remoteCall("local_switch_model", map[string]any{"model": "9b"})
+	if !ok || !strings.Contains(out, "неизвестная модель") {
+		t.Fatalf("switch invalid=%q ok=%v", out, ok)
+	}
+	if _, ok := a.remoteCall("battery_status", nil); ok {
+		t.Fatal("локальный инструмент не должен обрабатываться как удалённый")
+	}
+}
